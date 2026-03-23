@@ -993,7 +993,7 @@ function refreshCT(){
 // ══════════════════════════════════════════════════
 // Save SW
 // ══════════════════════════════════════════════════
-function saveSW(){
+async function saveSW(){
   const date=gvs('sw-date'),code=gvs('sw-loc');
   if(!date||!code){ alert(LANG==='th'?'กรุณาเลือกวันที่และกรอก Location':'Please select date and enter Location'); return; }
   if(code.length>10){ alert('Location ต้องไม่เกิน 10 อักษร'); return; }
@@ -1012,6 +1012,11 @@ function saveSW(){
   const status=bads.length>0?'FAIL':(cond>lim.cond*0.8||tur>5||th>lim.th*0.85||alk>lim.alk*0.85)?'WARN':'PASS';
   swLog.push({sid,date,locCode:code,type,name:gvs('sw-name'),tmp:gv('sw-tmp'),ph,cond,tur,tds,th,cah,alk,fe,status});
   localStorage.setItem('sw_log16',JSON.stringify(swLog));
+  // ── Send to Google Sheet ──
+  sendToGAS('save_sw',{
+    date,sid,locCode:code,type,name:gvs('sw-name'),
+    tmp:gv('sw-tmp'),ph,cond,tur,tds,th,cah,alk,fe,status
+  });
   g('ct-date').value=date; refreshCT(); sw_nav('ct');
   setTimeout(()=>{refreshLocDDL();refreshCT();},100);
   alert(`✅ ${sid} (${type})\nTDS Est: ${tds} | CaH Est: ${cah} | ${status}`);
@@ -1180,6 +1185,17 @@ async function analyze(){
     imgCount:reportImages.length});
   if(ctLog.length>100)ctLog.pop();
   localStorage.setItem('ct_log16',JSON.stringify(ctLog));
+  // ── Send to Google Sheet ──
+  sendToGAS('save_ct',{
+    date,ctid,ctype,loc,name,swid,
+    tmp:v.tmp,ph:v.ph,phEst:v.phEst,cond:v.cond,tur:v.tur,tds:v.tds,
+    th:v.th,caH:v.caH,alk:v.alk,fe:v.fe,
+    lsiStr:v.lsiStr,cl:v.cl,so4:v.so4,sio2:v.sio2,
+    rescl:v.rescl,orp:v.orp,tbc:v.tbc,
+    sci:v.sci,bio:v.bio,
+    coc:v.coc,rt:v.rt,evap:v.evap,blow:v.blow,makeup:v.makeup,
+    ov,note
+  });
   sw_nav('ai');
 }
 
@@ -1849,7 +1865,7 @@ function doHistSend(channel, sel){
 // ══════════════════════════════════════════════════
 let savedReports16 = JSON.parse(localStorage.getItem('ct_reports16')||'[]');
 
-function saveReport(){
+async function saveReport(){
   // Ensure buildReport has run (rptItems populated)
   buildReport();
   const v = lastV;
@@ -1888,10 +1904,19 @@ function saveReport(){
   try{
     localStorage.setItem('ct_reports16', JSON.stringify(savedReports16));
   }catch(e){
-    // Storage full — save without images
     const slim = savedReports16.map(r=>({...r,images:[],sig1Img:null}));
     localStorage.setItem('ct_reports16', JSON.stringify(slim));
   }
+  // ── Send to Google Sheet (without images/sig to keep size small) ──
+  sendToGAS('save_report',{
+    date: rec.date, loc: rec.loc, name: rec.name,
+    ctype: rec.ctype, ctid: rec.ctid, swid: rec.swid,
+    cond: rec.cond, coc: rec.coc, lsiStr: rec.lsiStr, ov: rec.ov,
+    sig1Name: rec.sig1Name, sig2Name: rec.sig2Name,
+    recommendation: rec.recommendation,
+    pin: rec.pin ? true : false,
+    imgCount: (rec.images||[]).length
+  });
 
   // Show preview button
   const aw = g('after-save-wrap');
@@ -2066,6 +2091,42 @@ CoC: ${rec.coc!==null?rec.coc.toFixed(2)+'×':'—'}  |  LSI: ${rec.lsiStr}
     const to=gvs('email-to')||prompt('กรอกอีเมล:','')||'';
     if(!to) return;
     window.open('mailto:'+to+'?subject='+encodeURIComponent('CT Report – '+rec.date+'  '+rec.name)+'&body='+encodeURIComponent(msg),'_self');
+  }
+}
+
+
+// ══════════════════════════════════════════════════
+// Google Apps Script — Send to Google Sheet
+// ══════════════════════════════════════════════════
+const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbxAZjH6Lv8ybZLoDHtxJR_xr5O3iqR-gyzhm5oGD-5ZOJJDnWAw4ZWTe3UQbt6JwnEHKw/exec';
+
+function getGASUrl(){
+  const el=g('cfg-gas');
+  return (el&&el.value.trim())||DEFAULT_GAS_URL;
+}
+
+async function sendToGAS(action, row){
+  const url = getGASUrl();
+  if(!url){ console.warn('GAS: no URL configured'); return; }
+  try{
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: {'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify({action, row})
+    });
+    const text = await resp.text();
+    try{
+      const json = JSON.parse(text);
+      if(json.status==='ok'){
+        console.log('%c✅ GAS saved to Sheet: '+action, 'color:green;font-weight:bold');
+      } else {
+        console.warn('GAS error:', json.msg);
+      }
+    }catch(e){
+      console.log('GAS response:', text);
+    }
+  }catch(e){
+    console.warn('GAS fetch failed:', e.message);
   }
 }
 
