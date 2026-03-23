@@ -1,0 +1,2074 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1">
+<title>Cooling Tower QA v16</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --dk:#0A3D62;--acc:#2E86C1;--lt:#D6EAF8;--md:#1A5276;
+  --auto:#4A235A;--auto-bg:#F3E5F5;--auto-bd:#CE93D8;
+  --sys:#1B5E20;--sys-bg:#E8F5E9;--sys-bd:#81C784;
+  --sw:#1A6B8A;--sw-bg:#EAF4FB;
+  --coc:#0E6655;--coc-bg:#C8F7C5;
+  --line:#06C755;--email:#EA4335;
+  --ok:#1E8449;--ok-bg:#D5F5E3;
+  --wn:#B7770D;--wn-bg:#FEF9E7;
+  --bd-c:#A93226;--bd-bg:#FADBD8;
+  --bg:#EEF2F7;--card:#fff;--text:#1A1A2E;--muted:#64748B;--border:#DDE3EC;
+  --r:16px;--rs:10px;--sh:0 2px 12px rgba(10,61,98,.07);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'IBM Plex Sans Thai',sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh}
+.app{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;display:flex;flex-direction:column}
+
+.topbar{background:var(--dk);padding:13px 16px 11px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20}
+.t1{font-size:15px;font-weight:600;color:#fff;letter-spacing:.02em}
+.t2{font-size:10px;color:var(--lt);opacity:.75;margin-top:1px}
+.tb-right{display:flex;align-items:center;gap:10px}
+.lang-btn{padding:4px 10px;border-radius:20px;border:1.5px solid rgba(255,255,255,.4);background:transparent;color:#fff;font-size:11px;font-weight:600;font-family:inherit;cursor:pointer;transition:background .15s}
+.lang-btn:hover{background:rgba(255,255,255,.15)}
+.live{width:8px;height:8px;border-radius:50%;background:#2ecc71;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+.nav{display:flex;background:var(--card);border-top:1px solid var(--border);position:sticky;bottom:0;z-index:20;box-shadow:0 -2px 8px rgba(0,0,0,.05)}
+.nb{flex:1;padding:9px 2px 7px;border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9px;font-family:inherit;color:var(--muted);transition:color .15s}
+.nb.on{color:var(--dk)}.nb svg{width:19px;height:19px}
+
+.scr{display:none;flex:1;padding:14px 14px 0;overflow-y:auto}.scr.on{display:block}
+.si{padding-bottom:20px}
+.slbl{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin:16px 0 8px;display:flex;align-items:center;gap:6px}
+.slbl:first-child{margin-top:4px}.slbl::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.card{background:var(--card);border-radius:var(--r);border:1px solid var(--border);box-shadow:var(--sh);padding:14px;margin-bottom:10px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
+.f{margin-bottom:0}
+.f label{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;color:var(--muted);margin-bottom:3px}
+.f label .lim{font-size:9px;color:#94A3B8}
+.f input,.f select{width:100%;padding:9px 11px;font-size:13px;font-family:'IBM Plex Mono',monospace;border-radius:var(--rs);border:1.5px solid var(--border);background:#F8FAFC;color:var(--text);-webkit-appearance:none;transition:border .15s}
+.f input:focus,.f select:focus{outline:none;border-color:var(--acc);background:#fff}
+.af{background:var(--auto-bg)!important;border-color:var(--auto-bd)!important;color:var(--auto)!important;font-weight:600}
+.sf{background:var(--sys-bg)!important;border-color:var(--sys-bd)!important;color:var(--sys)!important;font-weight:600}
+.swf{background:var(--sw-bg)!important;border-color:var(--sw)!important;color:var(--sw)!important;font-weight:600}
+.ac{display:inline-block;padding:1px 6px;border-radius:20px;font-size:8px;font-weight:700;background:var(--auto-bg);color:var(--auto);border:1px solid var(--auto-bd);margin-left:3px}
+.sc{display:inline-block;padding:1px 6px;border-radius:20px;font-size:8px;font-weight:700;background:var(--sys-bg);color:var(--sys);border:1px solid var(--sys-bd);margin-left:3px}
+
+.btn{width:100%;padding:13px;border-radius:var(--r);border:none;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;transition:opacity .15s,transform .1s;margin-top:12px}
+.btn:active{opacity:.85;transform:scale(.98)}
+.btn-p{background:var(--dk);color:#fff}
+.btn-s{background:transparent;border:1.5px solid var(--border);color:var(--text);margin-top:8px}
+.btn-line{background:var(--line);color:#fff}
+.btn-email{background:var(--email);color:#fff}
+
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:600}
+.b-ok{background:var(--ok-bg);color:var(--ok)}.b-wn{background:var(--wn-bg);color:var(--wn)}
+.b-bd{background:var(--bd-bg);color:var(--bd-c)}.b-coc{background:var(--coc-bg);color:var(--coc)}
+.bdot{width:6px;height:6px;border-radius:50%}
+.b-ok .bdot{background:var(--ok)}.b-wn .bdot{background:var(--wn)}.b-bd .bdot{background:var(--bd-c)}.b-coc .bdot{background:var(--coc)}
+
+.prow{margin-bottom:9px}.prow-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px}
+.prow-h span{font-size:11px;color:var(--muted)}.prow-h .pv{font-size:12px;font-weight:600;color:var(--text);font-family:'IBM Plex Mono',monospace}
+.ptrack{height:7px;background:var(--border);border-radius:4px;overflow:hidden}
+.pfill{height:100%;border-radius:4px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+
+.ap{background:var(--auto-bg);border:1px solid var(--auto-bd);border-radius:var(--rs);padding:11px 13px;margin-bottom:10px}
+.ap-t{font-size:9px;font-weight:700;color:var(--auto);text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px}
+.ar{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--auto-bd)}
+.ar:last-child{border-bottom:none}.ar .al{font-size:11px;color:var(--auto)}.ar .av{font-size:13px;font-weight:600;color:var(--auto);font-family:'IBM Plex Mono',monospace}
+
+.sp{background:var(--sys-bg);border:1px solid var(--sys-bd);border-radius:var(--rs);padding:11px 13px;margin-bottom:10px}
+.sp-t{font-size:9px;font-weight:700;color:var(--sys);text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px}
+.sr{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--sys-bd)}
+.sr:last-child{border-bottom:none}.sr .sl{font-size:11px;color:var(--sys)}.sr .sv{font-size:13px;font-weight:600;color:var(--sys);font-family:'IBM Plex Mono',monospace}
+
+.coc-box{background:var(--coc-bg);border:1px solid #6FCF97;border-radius:var(--rs);padding:12px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.coc-box .cl{font-size:11px;color:var(--coc);font-weight:500}.coc-box .cv{font-size:24px;font-weight:700;color:var(--coc);font-family:'IBM Plex Mono',monospace}.coc-box .cf{font-size:10px;color:var(--coc);margin-top:2px;opacity:.8}
+
+.lsi-box{background:#E3F2FD;border:1px solid #90CAF9;border-radius:var(--rs);padding:10px 13px;margin-bottom:10px}
+.lsi-t{font-size:9px;font-weight:700;color:#1565C0;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
+.lsi-r{display:flex;align-items:center;gap:8px}
+.lsi-v{font-size:20px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:#1565C0}
+.lsi-n{font-size:10px;color:#1565C0;margin-top:3px}
+
+.mrow{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:10px}
+.mc{background:#F0F5FB;border-radius:var(--rs);padding:10px 12px}
+.mc .ml{font-size:9px;color:var(--muted);margin-bottom:3px}.mc .mv{font-size:19px;font-weight:700;color:var(--text);font-family:'IBM Plex Mono',monospace}.mc .mu{font-size:9px;color:var(--muted)}
+
+.aic{background:#F8FAFC;border:1px solid var(--border);border-radius:var(--rs);padding:12px 14px;margin-bottom:9px}
+.aic-l{font-size:9px;font-weight:700;color:var(--acc);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+.aic p{font-size:12px;line-height:1.75;color:var(--text)}
+
+/* ── REPORT TABLE ── */
+.rpt-table{width:100%;border-collapse:collapse;margin-bottom:12px;font-size:11px}
+.rpt-table th{background:var(--dk);color:#fff;padding:7px 8px;text-align:left;font-weight:600;font-size:10px}
+.rpt-table td{padding:7px 8px;border-bottom:1px solid var(--border);vertical-align:middle}
+.rpt-table tr:last-child td{border-bottom:none}
+.rpt-table .param{font-weight:600;color:var(--text);font-family:'IBM Plex Mono',monospace}
+.rpt-table .val{font-family:'IBM Plex Mono',monospace;text-align:right;min-width:70px}
+.rpt-table .limit{color:var(--muted);font-size:10px;text-align:center}
+.rpt-table .status-ok  {color:var(--ok);font-weight:700;text-align:center}
+.rpt-table .status-wn  {color:var(--wn);font-weight:700;text-align:center}
+.rpt-table .status-bd  {color:var(--bd-c);font-weight:700;text-align:center}
+.rpt-table .comment{color:var(--muted);font-size:10px;font-style:italic}
+.rpt-section{background:#F0F4F8;padding:5px 8px;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border)}
+
+.rpt-header{background:var(--dk);border-radius:var(--r);padding:14px;margin-bottom:12px;color:#fff}
+.rpt-header .rh-title{font-size:15px;font-weight:700;margin-bottom:6px}
+.rpt-header .rh-meta{font-size:11px;opacity:.8;line-height:1.7}
+.rpt-ov{border-radius:var(--rs);padding:11px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.rpt-ov.ok{background:var(--ok-bg);border:1px solid #6FCF97}
+.rpt-ov.wn{background:var(--wn-bg);border:1px solid #F6D55C}
+.rpt-ov.bd{background:var(--bd-bg);border:1px solid #F09595}
+.rpt-ov .ov-icon{font-size:28px}
+.rpt-ov .ov-text{font-size:14px;font-weight:700}
+.rpt-ov .ov-sub{font-size:11px;margin-top:2px;opacity:.8}
+
+.send-tabs{display:flex;gap:9px;margin-bottom:14px}
+.send-tab{flex:1;padding:11px;border-radius:var(--rs);border:2px solid var(--border);background:var(--card);cursor:pointer;text-align:center;transition:all .15s}
+.send-tab.active-line{border-color:var(--line);background:#E9F5E9}
+.send-tab.active-email{border-color:var(--email);background:#FDE8E7}
+.send-tab .st-icon{font-size:20px;margin-bottom:4px}
+.send-tab .st-label{font-size:11px;font-weight:600;color:var(--text)}
+.send-tab.active-line .st-label{color:var(--line)}
+.send-tab.active-email .st-label{color:var(--email)}
+
+.email-fields{display:none}
+.email-fields.show{display:block}
+
+/* History */
+.hi{background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:10px 13px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:flex-start;box-shadow:var(--sh)}
+.sw-table{width:100%;font-size:11px;border-collapse:collapse}
+.sw-table th{text-align:left;padding:5px 6px;background:#F0F5FB;color:var(--muted);font-weight:600;font-size:10px;border-bottom:1px solid var(--border)}
+.sw-table td{padding:6px 6px;border-bottom:1px solid var(--border);font-family:'IBM Plex Mono',monospace;font-size:11px}
+.sw-table tr:last-child td{border-bottom:none}
+.id-c{color:var(--sw);font-weight:600;cursor:pointer;text-decoration:underline dotted}
+
+/* Settings */
+.cfg-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:12px}
+.cfg-card h3{font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px}
+.cfg-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px}
+.cfg-row:last-child{border-bottom:none}.cfg-row .cv{font-size:10px;color:var(--muted);font-family:'IBM Plex Mono',monospace}
+.lang-toggle-wrap{display:flex;gap:8px;margin-bottom:12px}
+.lang-opt{flex:1;padding:12px;border-radius:var(--rs);border:2px solid var(--border);background:var(--card);cursor:pointer;text-align:center;font-size:13px;font-weight:600;color:var(--muted);transition:all .15s}
+.lang-opt.active{border-color:var(--dk);color:var(--dk);background:var(--lt)}
+
+.tip{background:#FFF8E1;border:1px solid #FDE68A;border-radius:var(--rs);padding:11px 13px;margin-bottom:12px;font-size:11px;color:#92400E;line-height:1.7}
+.tip strong{display:block;font-size:12px;margin-bottom:3px}
+
+.info-bar{display:none;margin-top:6px;padding:7px 10px;background:var(--sw-bg);border-radius:var(--rs);border:1px solid var(--sw);font-size:11px;color:var(--sw)}
+.type-note{display:none;margin-top:6px;padding:7px 10px;border-radius:var(--rs);font-size:11px;font-weight:500}
+
+.load-over{display:none;position:fixed;inset:0;background:rgba(255,255,255,.94);z-index:50;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+.load-over.on{display:flex}
+.spin{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--dk);border-radius:50%;animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.ltxt{font-size:13px;color:var(--muted);font-family:inherit}
+.empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px;line-height:1.8}
+
+/* ── REPORT ITEM LIST ── */
+.rpt-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;margin-bottom:6px;border-radius:var(--rs);border:1.5px solid var(--border);background:var(--card);cursor:pointer;transition:border .15s,background .15s}
+.rpt-item:active{opacity:.85}
+.rpt-item.selected{border-color:var(--acc);background:#EBF5FB}
+.rpt-item.selected-ok{border-color:var(--ok);background:var(--ok-bg)}
+.rpt-item.selected-wn{border-color:#F0A500;background:var(--wn-bg)}
+.rpt-item.selected-bd{border-color:var(--bd-c);background:var(--bd-bg)}
+.rpt-item .chk{width:20px;height:20px;border-radius:6px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;transition:all .15s}
+.rpt-item.selected .chk,.rpt-item.selected-ok .chk,.rpt-item.selected-wn .chk,.rpt-item.selected-bd .chk{background:var(--dk);border-color:var(--dk);color:#fff}
+.rpt-item .ri-body{flex:1;min-width:0}
+.ri-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px}
+.ri-name{font-size:12px;font-weight:600;color:var(--text)}
+.ri-val{font-size:13px;font-weight:700;font-family:"IBM Plex Mono",monospace;color:var(--text)}
+.ri-row2{display:flex;justify-content:space-between;align-items:center}
+.ri-limit{font-size:10px;color:var(--muted)}
+.ri-status-ok{font-size:10px;font-weight:700;color:var(--ok)}
+.ri-status-wn{font-size:10px;font-weight:700;color:var(--wn)}
+.ri-status-bd{font-size:10px;font-weight:700;color:var(--bd-c)}
+.ri-comment{font-size:10px;color:var(--muted);font-style:italic;margin-top:3px}
+.ri-auto-tag{display:inline-block;padding:1px 5px;border-radius:10px;font-size:8px;font-weight:700;background:var(--auto-bg);color:var(--auto);border:1px solid var(--auto-bd);margin-left:4px;vertical-align:middle}
+.sec-header{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;padding:6px 0 4px;margin-top:8px;border-bottom:1px solid var(--border);margin-bottom:6px}
+
+/* ── REPORT HEADER KPI ── */
+.rh-lbl{display:block;font-size:9px;opacity:.7;margin-bottom:1px}
+.rh-val{display:block;font-size:13px;font-weight:600}
+.rh-kpi{background:rgba(255,255,255,.12);border-radius:var(--rs);padding:8px 10px;text-align:center}
+.rh-kv{font-size:18px;font-weight:700;font-family:"IBM Plex Mono",monospace;line-height:1.2}
+.rh-ku{font-size:9px;opacity:.7;margin-top:1px}
+
+/* ── HISTORY MULTI-SELECT ── */
+.hist-item{background:var(--card);border:1.5px solid var(--border);border-radius:var(--rs);padding:10px 12px;margin-bottom:7px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;transition:border .12s,background .12s;box-shadow:var(--sh)}
+.hist-item.sel{border-color:var(--acc);background:#EBF5FB}
+.hist-item .hi-chk{width:22px;height:22px;border-radius:6px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;margin-top:1px;transition:all .12s;background:var(--card)}
+.hist-item.sel .hi-chk{background:var(--dk);border-color:var(--dk);color:#fff}
+.hist-item .hi-body{flex:1;min-width:0}
+.hi-row1{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px}
+.hi-title{font-size:12px;font-weight:600;color:var(--text)}
+.hi-meta{font-size:10px;color:var(--muted);margin-bottom:3px}
+.hi-kpis{display:flex;gap:8px;flex-wrap:wrap;margin-top:3px}
+.hi-kpi{font-size:10px;font-family:"IBM Plex Mono",monospace;padding:2px 7px;border-radius:20px;background:#F0F5FB;color:var(--dk);font-weight:500}
+.hi-kpi.ok{background:var(--ok-bg);color:var(--ok)}
+.hi-kpi.wn{background:var(--wn-bg);color:var(--wn)}
+.hi-kpi.bd{background:var(--bd-bg);color:var(--bd-c)}
+.hist-toolbar{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.hist-toolbar button{padding:7px 12px;border-radius:20px;border:1.5px solid var(--border);background:var(--card);color:var(--text);font-size:11px;font-weight:600;font-family:inherit;cursor:pointer;transition:all .12s}
+.hist-toolbar button.active{background:var(--dk);color:#fff;border-color:var(--dk)}
+.hist-toolbar button:hover{border-color:var(--acc)}
+/* ── v13 additions ── */
+.img-thumb-wrap{position:relative;width:80px;height:80px;border-radius:var(--rs);overflow:hidden;border:1px solid var(--border)}
+.img-thumb-wrap img{width:100%;height:100%;object-fit:cover}
+.img-thumb-del{position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;background:rgba(169,50,38,.85);color:#fff;border:none;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+.pin-locked{display:inline-flex;align-items:center;gap:4px;font-size:10px;background:#FEF9E7;color:#B7770D;border:1px solid #F0A500;border-radius:20px;padding:2px 7px;font-weight:600}
+.hist-toolbar{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.hist-toolbar button{padding:7px 10px;border-radius:20px;border:1.5px solid var(--border);background:var(--card);color:var(--text);font-size:11px;font-weight:600;font-family:inherit;cursor:pointer;transition:all .12s}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="load-over" id="lOver"><div class="spin"></div><div class="ltxt" id="lTxt">...</div></div>
+
+<!-- Topbar -->
+<div class="topbar">
+  <div><div class="t1" id="tb-title">Cooling Tower QA</div><div class="t2" id="tb-sub">v13 | PIN | Image | Email History</div></div>
+  <div class="tb-right">
+    <button class="lang-btn" onclick="toggleLang()" id="lang-btn">EN</button>
+    <div class="live"></div>
+  </div>
+</div>
+
+<!-- ══════════════ SUPPLY WATER ══════════════ -->
+<div class="scr on" id="s-sw"><div class="si">
+  <div class="slbl" id="l-sw-info">ข้อมูลตัวอย่าง — Supply Water</div>
+  <div class="card">
+    <div class="g3">
+      <div class="f"><label id="l-date">วันที่</label><input type="date" id="sw-date" oninput="updateSWID()"></div>
+      <div class="f"><label id="l-loc">Location <span class="lim">≤10</span></label>
+        <input type="text" id="sw-loc" placeholder="MKH" maxlength="10" style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase().slice(0,10);updateSWID()"></div>
+      <div class="f"><label id="l-seq">ลำดับ<span class="ac">AUTO</span></label><input type="text" id="sw-seq" readonly class="af" placeholder="XX"></div>
+    </div>
+    <div class="f" style="margin-top:9px"><label>Sample ID<span class="ac">AUTO</span></label><input type="text" id="sw-sid" readonly class="af" placeholder="SW-DDMMYY-LOC-XX"></div>
+    <div class="g2" style="margin-top:9px">
+      <div class="f"><label id="l-type">ประเภทแหล่งน้ำ</label>
+        <select id="sw-type" onchange="onSwType()">
+          <option value="Municipal">Municipal</option>
+          <option value="Soft Water">Soft Water</option>
+          <option value="RO Water">RO Water</option>
+          <option value="Well Water">Well Water</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="f"><label id="l-sname">Sample Name</label><input type="text" id="sw-name" value="Makeup Header-1"></div>
+    </div>
+    <div id="sw-type-note" class="type-note"></div>
+  </div>
+
+  <div class="slbl" id="l-sw-phys">Physical / Chemical</div>
+  <div class="card">
+    <div class="g3">
+      <div class="f"><label>Temp<span class="lim">°C 15–30</span></label><input type="number" id="sw-tmp" step="0.1" value="28.5"></div>
+      <div class="f"><label>pH<span class="lim">6.5–7.5</span></label><input type="number" id="sw-ph" step="0.1" value="7.0"></div>
+      <div class="f"><label id="l-cond-sw">Conductivity<span class="lim" id="sw-cond-lim">&lt;1000</span></label>
+        <input type="number" id="sw-cond" value="420" oninput="calcSWAuto()"></div>
+    </div>
+    <div class="g2" style="margin-top:9px">
+      <div class="f"><label>Turbidity<span class="lim">NTU &lt;10</span></label><input type="number" id="sw-tur" step="0.1" value="2.1"></div>
+      <div class="f"><label>TDS Est.<span class="ac">AUTO</span></label><input type="text" id="sw-tds" class="af" readonly></div>
+    </div>
+  </div>
+
+  <div class="slbl" id="l-sw-chem">Chemistry</div>
+  <div class="card">
+    <div class="g2">
+      <div class="f"><label id="l-th-sw">Total Hardness<span class="lim" id="sw-th-lim">&lt;150 mg/L</span></label><input type="number" id="sw-th" value="85" oninput="calcSWAuto()"></div>
+      <div class="f"><label>Ca Hardness Est.<span class="ac">AUTO</span></label><input type="text" id="sw-cah" class="af" readonly></div>
+    </div>
+    <div class="g2" style="margin-top:9px">
+      <div class="f"><label>M-Alkalinity<span class="lim" id="sw-alk-lim">&lt;300 mg/L</span></label><input type="number" id="sw-alk" value="180"></div>
+      <div class="f"><label>Total Iron<span class="lim">&lt;1.0 mg/L</span></label><input type="number" id="sw-fe" step="0.01" value="0.4"></div>
+    </div>
+  </div>
+  <button class="btn btn-p" id="btn-save-sw" onclick="saveSW()">บันทึก Supply Water →</button>
+</div></div>
+
+<!-- ══════════════ COOLING TOWER ══════════════ -->
+<div class="scr" id="s-ct"><div class="si">
+  <div class="slbl" id="l-ct-info">ข้อมูลตัวอย่าง — Cooling Tower</div>
+  <div class="card">
+    <div class="g2">
+      <div class="f"><label id="l-date2">วันที่</label><input type="date" id="ct-date" onchange="refreshCT()"></div>
+      <div class="f"><label id="l-cttype">CT Type</label>
+        <select id="ct-type" onchange="onCTType();calcSysAuto()">
+          <option value="Standard">Standard</option>
+          <option value="Evaporative">Evaporative</option>
+          <option value="Ammonia">Ammonia</option>
+          <option value="Absorption">Absorption</option>
+        </select>
+      </div>
+    </div>
+    <div class="f" style="margin-top:9px"><label>CT ID<span class="ac">AUTO</span></label><input type="text" id="ct-id" class="af" readonly></div>
+    <div class="g2" style="margin-top:9px">
+      <div class="f"><label id="l-ctloc">Location <span class="lim" style="color:var(--sw)">จาก SW</span></label>
+        <select id="ct-loc" onchange="refreshCT();updateCTID()"><option value="">-- เลือก --</option></select></div>
+      <div class="f"><label id="l-ctsname">Sample Name</label><input type="text" id="ct-name" value="Cooling Tower A"></div>
+    </div>
+    <div class="f" style="margin-top:9px">
+      <label id="l-swid">SW Sample ID <span class="lim" style="color:var(--sw)">เลือกแหล่งน้ำ (วันนี้+Location)</span></label>
+      <select id="ct-swid" onchange="onSWIDSel()" style="color:var(--sw);background:var(--sw-bg);border-color:var(--sw)">
+        <option value="">-- เลือก SW ID --</option>
+      </select>
+    </div>
+    <div id="sw-info" class="info-bar"></div>
+    <div id="coc-live" style="display:none;margin-top:10px">
+      <div class="coc-box">
+        <div><div class="cl">CoC (2.0–8.0)</div><div class="cv" id="coc-v">—</div><div class="cf" id="coc-f"></div></div>
+        <div id="coc-bl"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slbl" id="l-ct-phys">Physical</div>
+  <div class="card">
+    <div class="g3">
+      <div class="f"><label>Temp<span class="lim">25–35°C</span></label><input type="number" id="ct-tmp" step="0.1" value="32.0" oninput="calcCTAuto()"></div>
+      <div class="f"><label>pH<span class="lim">7.0–8.5</span></label><input type="number" id="ct-ph" step="0.1" value="7.8" oninput="calcCTAuto()"></div>
+      <div class="f"><label>Conductivity<span class="lim">1000–2500</span></label><input type="number" id="ct-cond" value="1850" oninput="calcCTAuto();updateCoCLive()"></div>
+    </div>
+    <div class="g2" style="margin-top:9px">
+      <div class="f"><label>Turbidity<span class="lim">&lt;10 NTU</span></label><input type="number" id="ct-tur" step="0.1" value="4.2"></div>
+      <div class="f"><label>TDS Est.<span class="ac">AUTO</span></label><input type="text" id="ct-tds" class="af" readonly></div>
+    </div>
+  </div>
+
+  <div class="slbl" id="l-ct-chem">Chemistry</div>
+  <div class="card">
+    <div class="g2">
+      <div class="f"><label>Total Hardness<span class="lim">&lt;500</span></label><input type="number" id="ct-th" value="450" oninput="calcCTAuto()"></div>
+      <div class="f"><label>Ca Hardness Est.<span class="ac">AUTO</span></label><input type="text" id="ct-cah" class="af" readonly></div>
+    </div>
+    <div class="g2" style="margin-top:9px">
+      <div class="f"><label>M-Alkalinity<span class="lim">100–400</span></label><input type="number" id="ct-alk" value="220" oninput="calcCTAuto()"></div>
+      <div class="f"><label>pH Est.<span class="ac">AUTO</span></label><input type="text" id="ct-phest" class="af" readonly></div>
+    </div>
+    <div class="f" style="margin-top:9px"><label>Total Iron<span class="lim">mg/L (0.01)</span></label><input type="number" id="ct-fe" step="0.01" value="0.01"></div>
+  </div>
+  <div id="lsi-panel" class="lsi-box">
+    <div class="lsi-t">LSI Range (Langelier)<span class="ac" style="background:#E3F2FD;color:#1565C0;border-color:#90CAF9">AUTO</span></div>
+    <div class="lsi-r"><div class="lsi-v" id="lsi-mn">—</div><div style="font-size:14px;color:#1565C0;opacity:.5">–</div><div class="lsi-v" id="lsi-mx">—</div></div>
+    <div class="lsi-n" id="lsi-note">ข้อมูลยังไม่ครบ</div>
+  </div>
+
+  <div class="slbl" id="l-ct-scale">Scale & Ions</div>
+  <div class="card">
+    <div class="g3">
+      <div class="f"><label>Chloride<span class="lim">&lt;300</span></label><input type="number" id="ct-cl" value="185"></div>
+      <div class="f"><label>Sulfate<span class="lim">&lt;500</span></label><input type="number" id="ct-so4" value="210"></div>
+      <div class="f"><label>Silica<span class="lim">&lt;150</span></label><input type="number" id="ct-sio2" value="62"></div>
+    </div>
+  </div>
+
+  <div class="slbl" id="l-ct-bio">Biological</div>
+  <div class="card">
+    <div class="g2">
+      <div class="f"><label id="l-rescl">Residual Cl₂<span class="lim">0.2–1.0 ppm</span></label><input type="number" id="ct-rescl" step="0.01" value="0.01"></div>
+      <div class="f"><label>ORP<span class="lim">300–600 mV</span></label><input type="number" id="ct-orp" value="0"></div>
+    </div>
+    <div class="f" style="margin-top:9px"><label>TBC Count<span class="lim">&lt;10,000 CFU/mL</span></label><input type="number" id="ct-tbc" value="0"></div>
+  </div>
+
+  <div class="slbl" id="l-ct-chem2">Chemical Dosing</div>
+  <div class="card">
+    <div class="g2">
+      <div class="f"><label>Scale Inhibitor<span class="lim">mg/L</span></label><input type="number" id="ct-sci" value="8"></div>
+      <div class="f"><label>Biocide<span class="lim">mg/L</span></label><input type="number" id="ct-bio" value="15"></div>
+    </div>
+  </div>
+
+  <div class="slbl" id="l-ct-sys">System Status</div>
+  <div class="card">
+    <div class="g3">
+      <div class="f"><label>Recirc. Rate<span class="lim">m³/hr</span></label><input type="number" id="ct-recirc" value="200" oninput="calcSysAuto()"></div>
+      <div class="f"><label id="l-cds">Hot Water Inlet<span class="lim">°C</span></label><input type="number" id="ct-tin" step="0.1" value="36.0" oninput="calcSysAuto()"></div>
+      <div class="f"><label id="l-cdr">Cold Water Outlet<span class="lim">°C</span></label><input type="number" id="ct-tout" step="0.1" value="32.0" oninput="calcSysAuto()"></div>
+    </div>
+    <div class="g3" style="margin-top:9px">
+      <div class="f"><label id="l-rt">Est. RT usage (ton)<span class="sc">AUTO</span></label><input type="text" id="ct-rt" class="sf" readonly></div>
+      <div class="f"><label id="l-evap">Est. Evap<span class="sc">AUTO</span></label><input type="text" id="ct-evap" class="sf" readonly></div>
+      <div class="f"><label id="l-blow">Est. Blowdown<span class="sc">AUTO</span></label><input type="text" id="ct-blow" class="sf" readonly></div>
+    </div>
+    <div class="f" style="margin-top:9px"><label id="l-makeup">Est. Make Up<span class="sc">AUTO</span></label><input type="text" id="ct-makeup" class="sf" readonly></div>
+  </div>
+
+  <div class="card" style="margin-bottom:0">
+    <div class="f"><label id="l-note" style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">หมายเหตุ</label>
+    <input type="text" id="ct-note" placeholder="เช่น เติม biocide 08:00 น."></div>
+  </div>
+  <button class="btn btn-p" id="btn-analyze" onclick="analyze()">วิเคราะห์ด้วย AI →</button>
+</div></div>
+
+<!-- ══════════════ AI RESULT ══════════════ -->
+<div class="scr" id="s-ai"><div class="si">
+  <div id="ai-badge" style="margin-bottom:12px"></div>
+  <div class="ap">
+    <div class="ap-t" id="l-auto-calc">ค่าคำนวณอัตโนมัติ<span class="ac">AUTO</span></div>
+    <div class="ar"><span class="al">TDS Est.</span><span class="av" id="r-tds">—</span></div>
+    <div class="ar"><span class="al">pH Est.</span><span class="av" id="r-ph">—</span></div>
+    <div class="ar"><span class="al">Ca Hardness Est.</span><span class="av" id="r-cah">—</span></div>
+    <div class="ar"><span class="al">LSI Range</span><span class="av" id="r-lsi">—</span></div>
+  </div>
+  <div class="sp">
+    <div class="sp-t" id="l-sys-status">System Status<span class="sc">AUTO</span></div>
+    <div class="sr"><span class="sl">CT Type</span><span class="sv" id="r-type">—</span></div>
+    <div class="sr"><span class="sl" id="l-r-rt">Est. RT usage (ton)</span><span class="sv" id="r-rt">—</span></div>
+    <div class="sr"><span class="sl" id="l-r-evap">Est. Evap Rate</span><span class="sv" id="r-evap">—</span></div>
+    <div class="sr"><span class="sl" id="l-r-blow">Est. Blowdown</span><span class="sv" id="r-blow">—</span></div>
+    <div class="sr"><span class="sl" id="l-r-makeup">Est. Make Up</span><span class="sv" id="r-makeup">—</span></div>
+  </div>
+  <div class="coc-box">
+    <div><div class="cl">CoC (2.0–8.0)</div><div class="cv" id="ai-coc">—</div><div class="cf" id="ai-coc-d">—</div></div>
+    <div id="ai-coc-b"></div>
+  </div>
+  <div class="mrow">
+    <div class="mc"><div class="ml">pH</div><div class="mv" id="d-ph">—</div></div>
+    <div class="mc"><div class="ml">Conductivity</div><div class="mv" id="d-cond">—</div><span class="mu">µS/cm</span></div>
+    <div class="mc"><div class="ml" id="l-rescl2">Residual Cl₂</div><div class="mv" id="d-rescl">—</div><span class="mu">ppm</span></div>
+    <div class="mc"><div class="ml">TBC</div><div class="mv" id="d-tbc">—</div><span class="mu">CFU/mL</span></div>
+  </div>
+  <div class="card" style="padding:14px 14px 6px"><div id="bars"></div></div>
+  <div class="aic" style="margin-top:10px"><div class="aic-l" id="l-ai-sum">สรุปสถานะ</div><p id="ai-sum">—</p></div>
+  <div class="aic"><div class="aic-l" id="l-ai-leg">ความเสี่ยง Legionella</div><p id="ai-leg">—</p></div>
+  <div class="aic"><div class="aic-l">CoC · LSI · System</div><p id="ai-trend">—</p></div>
+  <div class="aic"><div class="aic-l" id="l-ai-act">คำแนะนำ</div><p id="ai-act">—</p></div>
+  <button class="btn btn-p" id="btn-report" onclick="sw_nav('report')">ดูรายงานสรุป →</button>
+  <button class="btn btn-s" onclick="sw_nav('ct')">← แก้ไขข้อมูล</button>
+</div></div>
+
+<!-- ══════════════ REPORT ══════════════ -->
+<div class="scr" id="s-report"><div class="si">
+
+  <!-- Report Header -->
+  <div class="rpt-header" id="rpt-header">
+    <div class="rh-title" id="rpt-title">รายงานคุณภาพน้ำ — Cooling Tower</div>
+    <div class="rh-grid4" style="display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;margin-top:10px">
+      <div><span class="rh-lbl">Date</span><span class="rh-val" id="rpt-date">—</span></div>
+      <div><span class="rh-lbl">Location</span><span class="rh-val" id="rpt-loc">—</span></div>
+      <div><span class="rh-lbl">Sample Name</span><span class="rh-val" id="rpt-sname">—</span></div>
+      <div><span class="rh-lbl">Sample Type</span><span class="rh-val" id="rpt-stype">—</span></div>
+    </div>
+    <div style="border-top:1px solid rgba(255,255,255,.25);margin:10px 0"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+      <div class="rh-kpi"><div class="rh-lbl">Conductivity</div><div class="rh-kv" id="rpt-cond">—</div><div class="rh-ku">µS/cm</div></div>
+      <div class="rh-kpi"><div class="rh-lbl">CoC</div><div class="rh-kv" id="rpt-coc">—</div><div class="rh-ku">×</div></div>
+      <div class="rh-kpi"><div class="rh-lbl">LSI Range</div><div class="rh-kv" id="rpt-lsi" style="font-size:14px">—</div><div class="rh-ku" id="rpt-lsi-note">—</div></div>
+    </div>
+  </div>
+
+  <!-- Overall Status -->
+  <div class="rpt-ov" id="rpt-ov">
+    <div class="ov-icon" id="rpt-ov-icon">—</div>
+    <div><div class="ov-text" id="rpt-ov-text">—</div><div class="ov-sub" id="rpt-ov-sub">—</div></div>
+  </div>
+
+  <!-- Parameter List -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+    <div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">รายละเอียดพารามิเตอร์</div>
+    <div style="display:flex;gap:7px">
+      <button onclick="checkAll(true)"  style="padding:3px 9px;border-radius:20px;border:1px solid var(--ok);background:var(--ok-bg);color:var(--ok);font-size:10px;font-weight:600;font-family:inherit;cursor:pointer">เลือกทั้งหมด</button>
+      <button onclick="checkAll(false)" style="padding:3px 9px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:10px;font-weight:600;font-family:inherit;cursor:pointer">ล้าง</button>
+    </div>
+  </div>
+  <div id="rpt-table-wrap"></div>
+
+  <!-- AI Comment (editable) -->
+  <div class="card" style="margin-bottom:12px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <div style="font-size:9px;font-weight:700;color:var(--acc);text-transform:uppercase;letter-spacing:.08em">ข้อเสนอแนะ</div>
+      <button onclick="toggleEditComment()" id="btn-edit-comment" style="padding:3px 10px;border-radius:20px;border:1px solid var(--acc);background:transparent;color:var(--acc);font-size:10px;font-weight:600;font-family:inherit;cursor:pointer">✏️ แก้ไข</button>
+    </div>
+    <p style="font-size:12px;line-height:1.75;color:var(--text)" id="rpt-comment">—</p>
+    <textarea id="rpt-comment-edit" style="display:none;width:100%;min-height:100px;padding:9px;font-size:12px;font-family:inherit;border-radius:var(--rs);border:1.5px solid var(--acc);line-height:1.75;resize:vertical"></textarea>
+  </div>
+
+  <!-- Image Reference -->
+  <div class="card" style="margin-bottom:12px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">รูปภาพอ้างอิง</div>
+      <label for="img-upload" style="padding:4px 11px;border-radius:20px;border:1.5px solid var(--acc);background:transparent;color:var(--acc);font-size:10px;font-weight:600;cursor:pointer">+ เพิ่มรูป</label>
+    </div>
+    <input type="file" id="img-upload" accept="image/*" multiple style="display:none" onchange="handleImgUpload(event)">
+    <div id="img-preview-wrap" style="display:flex;flex-wrap:wrap;gap:8px;min-height:40px">
+      <div style="font-size:11px;color:var(--muted);padding:10px 0" id="img-empty-hint">ยังไม่มีรูปภาพ — กด "+ เพิ่มรูป"</div>
+    </div>
+  </div>
+
+  <!-- Signature -->
+  <div class="card" style="margin-bottom:12px">
+    <div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">ลงนาม / Signature</div>
+    <div class="g2">
+      <div class="f"><label>ผู้ตรวจสอบ / Inspector</label><input type="text" id="sig1-name" placeholder="ชื่อ / Name"></div>
+      <div class="f"><label>ตำแหน่ง</label><input type="text" id="sig1-pos" placeholder="ตำแหน่ง"></div>
+    </div>
+    <div style="margin-top:9px;border-top:2px solid var(--border);padding-top:9px">
+      <div style="font-size:10px;color:var(--muted);margin-bottom:12px">ลายเซ็น</div>
+      <canvas id="sig1-canvas" width="360" height="80" style="border:1.5px solid var(--border);border-radius:var(--rs);width:100%;height:80px;cursor:crosshair;touch-action:none;background:#FAFBFC"></canvas>
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <button onclick="clearSig()" style="flex:1;padding:8px;border-radius:var(--rs);border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;font-family:inherit;cursor:pointer">ลบลายเซ็น</button>
+        <button onclick="saveSigName()" style="flex:2;padding:8px;border-radius:var(--rs);border:none;background:var(--dk);color:#fff;font-size:11px;font-family:inherit;cursor:pointer">บันทึกชื่อ</button>
+      </div>
+    </div>
+    <div style="margin-top:9px;border-top:1px solid var(--border);padding-top:9px">
+      <div class="g2">
+        <div class="f"><label>ผู้รับบริการ</label><input type="text" id="sig2-name" placeholder="ชื่อผู้รับบริการ"></div>
+        <div class="f"><label>ตำแหน่ง</label><input type="text" id="sig2-pos" placeholder="ตำแหน่ง"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PIN Lock -->
+  <div class="card" style="margin-bottom:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">รหัสป้องกัน (ไม่บังคับ)</div>
+      <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer">
+        <input type="checkbox" id="pin-enable" onchange="togglePin()" style="width:16px;height:16px;cursor:pointer">
+        <span>เปิดใช้</span>
+      </label>
+    </div>
+    <div id="pin-fields" style="display:none">
+      <div class="f">
+        <label>ตั้งรหัส 4 หลัก</label>
+        <input type="password" id="pin-input" maxlength="4" inputmode="numeric" placeholder="0000"
+          style="letter-spacing:8px;font-size:20px;text-align:center;font-family:'IBM Plex Mono',monospace">
+      </div>
+    </div>
+  </div>
+
+  <!-- ① SAVE REPORT BUTTON -->
+  <button class="btn btn-p" id="btn-save-rpt" onclick="saveReport()"
+    style="background:linear-gradient(135deg,#0A3D62,#1A5276);font-size:15px;margin-top:8px">
+    💾 บันทึกรายงาน
+  </button>
+
+  <!-- ② PREVIEW BUTTON — shown after save -->
+  <div id="after-save-wrap" style="display:none;margin-top:10px">
+    <div style="text-align:center;padding:8px;background:var(--ok-bg);border-radius:var(--rs);border:1px solid var(--ok);margin-bottom:10px">
+      <span style="color:var(--ok);font-weight:600;font-size:12px">✅ บันทึกรายงานแล้ว</span>
+    </div>
+    <button class="btn" onclick="previewSavedReport()"
+      style="background:#fff;border:2px solid var(--dk);color:var(--dk);margin-top:0;font-size:14px">
+      👁 ดูตัวอย่างรายงานที่บันทึก
+    </button>
+  </div>
+
+  <button class="btn btn-s" onclick="sw_nav('ai')" style="margin-top:8px">← กลับผล AI</button>
+
+  <!-- ④ SEND CHANNEL — bottom, after save -->
+  <div id="send-channel-section" style="margin-top:20px;border-top:1px solid var(--border);padding-top:16px">
+    <div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">เลือกช่องทางส่งออก</div>
+    <div class="send-tabs">
+      <div class="send-tab active-line" id="tab-line" onclick="selectChannel('line')">
+        <div class="st-icon">💬</div><div class="st-label">LINE</div>
+      </div>
+      <div class="send-tab" id="tab-email" onclick="selectChannel('email')">
+        <div class="st-icon">✉️</div><div class="st-label">Email</div>
+      </div>
+    </div>
+    <div class="email-fields" id="email-fields">
+      <div class="card">
+        <div class="f" style="margin-bottom:9px"><label>To (อีเมล)</label><input type="email" id="email-to" placeholder="engineer@company.com"></div>
+        <div class="f"><label>Subject</label><input type="text" id="email-subj" placeholder="Water Quality Report"></div>
+      </div>
+    </div>
+    <button class="btn btn-line" id="btn-send-ch" onclick="sendReport()" style="margin-top:8px">ส่งรายงานไปยัง LINE →</button>
+  </div>
+
+</div></div>
+
+<!-- ══════════════ HISTORY ══════════════ -->
+<div class="scr" id="s-hist"><div class="si">
+  <div class="slbl" id="l-sw-log">Supply Water Log</div>
+  <div class="card" style="padding:10px">
+    <table class="sw-table">
+      <thead><tr><th>Sample ID</th><th>Date</th><th>Loc</th><th>Type</th><th>Cond</th><th id="l-th-status">St.</th></tr></thead>
+      <tbody id="sw-body"><tr><td colspan="6" style="text-align:center;padding:14px;color:var(--muted)">ยังไม่มีข้อมูล</td></tr></tbody>
+    </table>
+  </div>
+  <div class="slbl" id="l-ct-log">Cooling Tower Log</div>
+  <!-- Multi-select toolbar -->
+  <div class="hist-toolbar" id="ct-hist-toolbar">
+    <button onclick="histSelAll(true)"   id="btn-hsel-all">เลือกทั้งหมด</button>
+    <button onclick="histSelAll(false)"  id="btn-hsel-none">ล้างการเลือก</button>
+    <button onclick="histDeleteSelected()" id="btn-hsel-del" style="background:var(--bd-bg);color:var(--bd-c);border-color:var(--bd-c)">🗑 ลบ</button>
+    <button onclick="histEditSelected()"  id="btn-hsel-edit">✏️ แก้ไข</button>
+    <button onclick="histSendSelected('line')"  id="btn-hsel-send" style="background:var(--line);color:#fff;border-color:var(--line)">LINE →</button>
+    <button onclick="histSendSelected('email')" id="btn-hsel-email" style="background:var(--email);color:#fff;border-color:var(--email)">Email →</button>
+  </div>
+  <!-- PIN unlock prompt (shown when a locked record is selected) -->
+  <div id="hist-pin-prompt" style="display:none;margin-bottom:10px">
+    <div class="card" style="border-color:#F0A500;background:#FFFBEB">
+      <div style="font-size:11px;color:var(--wn);font-weight:600;margin-bottom:7px" id="l-hist-pin-prompt">🔒 รายการที่เลือกมีการเข้ารหัส — กรอก PIN เพื่อดูหรือส่ง</div>
+      <div style="display:flex;gap:8px">
+        <input type="password" id="hist-pin-input" maxlength="4" inputmode="numeric"
+          placeholder="0000" style="flex:1;padding:9px;font-size:18px;text-align:center;border-radius:var(--rs);border:1.5px solid #F0A500;background:#fff;font-family:'IBM Plex Mono',monospace;letter-spacing:6px">
+        <button onclick="verifyHistPin()" style="padding:9px 16px;border-radius:var(--rs);border:none;background:var(--dk);color:#fff;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer" id="btn-hist-pin-ok">확인 / OK</button>
+      </div>
+    </div>
+  </div>
+  <div id="ct-hist"><div class="empty" id="l-no-ct">ยังไม่มีประวัติ CT</div></div>
+</div></div>
+
+<!-- ══════════════ SETTINGS ══════════════ -->
+<div class="scr" id="s-cfg"><div class="si">
+  <div class="cfg-card">
+    <h3 id="l-lang-setting">ภาษา / Language</h3>
+    <div class="lang-toggle-wrap">
+      <div class="lang-opt active" id="lang-th" onclick="setLang('th')">🇹🇭 ภาษาไทย</div>
+      <div class="lang-opt" id="lang-en" onclick="setLang('en')">🇬🇧 English</div>
+    </div>
+  </div>
+  <div class="cfg-card">
+    <h3 id="l-api-keys">API Keys</h3>
+    <div class="f" style="margin-bottom:9px"><label>Anthropic API Key</label><input type="password" id="cfg-ant" placeholder="sk-ant-api03-..." oninput="saveCfg()"></div>
+    <div class="f" style="margin-bottom:9px"><label>LINE Channel Access Token</label><input type="password" id="cfg-lt" oninput="saveCfg()"></div>
+    <div class="f"><label id="l-line-uid">LINE User ID</label><input type="text" id="cfg-uid" placeholder="Uxxxxxxxx..." oninput="saveCfg()"></div>
+  </div>
+  <div class="cfg-card">
+    <h3 id="l-limits-ref">Limits Reference</h3>
+    <div class="cfg-row"><label>pH (SW)</label><span class="cv">6.5–7.5</span></div>
+    <div class="cfg-row"><label>pH (CT)</label><span class="cv">7.0–8.5</span></div>
+    <div class="cfg-row"><label>Cond. (Municipal)</label><span class="cv">&lt;1,000 µS/cm</span></div>
+    <div class="cfg-row"><label>Cond. (RO)</label><span class="cv">&lt;40 µS/cm</span></div>
+    <div class="cfg-row"><label>TH (RO+Soft)</label><span class="cv">&lt;10 mg/L</span></div>
+    <div class="cfg-row"><label>M-Alk (RO)</label><span class="cv">&lt;50 mg/L</span></div>
+    <div class="cfg-row"><label>CoC</label><span class="cv">2.0–8.0 ×</span></div>
+    <div class="cfg-row"><label>Residual Cl₂</label><span class="cv">0.2–1.0 ppm</span></div>
+    <div class="cfg-row"><label>LSI</label><span class="cv">–0.5 – +0.5</span></div>
+  </div>
+  <div class="cfg-card"><h3 id="l-data-mgmt">Data Management</h3>
+    <button onclick="clearAll()" style="width:100%;padding:10px;border-radius:var(--rs);border:1.5px solid var(--bd-bg);background:transparent;color:var(--bd-c);font-size:12px;font-family:inherit;cursor:pointer" id="btn-clear">ล้างข้อมูลทั้งหมด</button>
+  </div>
+</div></div>
+
+<!-- NAV -->
+<nav class="nav">
+  <button class="nb on" id="nb-sw" onclick="sw_nav('sw')">
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+    <span class="nb-l" id="nb-sw-l">Supply</span>
+  </button>
+  <button class="nb" id="nb-ct" onclick="sw_nav('ct')">
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+    <span class="nb-l" id="nb-ct-l">CT Entry</span>
+  </button>
+  <button class="nb" id="nb-ai" onclick="sw_nav('ai')">
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm6 0V9a2 2 0 00-2-2h-2a2 2 0 00-2 2v10m10 0V5a2 2 0 00-2-2h-2a2 2 0 00-2 2v14"/></svg>
+    <span class="nb-l" id="nb-ai-l">AI Result</span>
+  </button>
+  <button class="nb" id="nb-report" onclick="sw_nav('report')">
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+    <span class="nb-l" id="nb-rpt-l">Report</span>
+  </button>
+  <button class="nb" id="nb-hist" onclick="sw_nav('hist');renderHist()">
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    <span class="nb-l" id="nb-hist-l">History</span>
+  </button>
+  <button class="nb" id="nb-cfg" onclick="sw_nav('cfg')">
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
+    <span class="nb-l" id="nb-cfg-l">Settings</span>
+  </button>
+</nav>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+// i18n — Translation strings
+// ══════════════════════════════════════════════════
+const T = {
+  th: {
+    'tb-title':'Cooling Tower QA','tb-sub':'v13 | PIN | Image | Email History',
+    'l-sw-info':'ข้อมูลตัวอย่าง — Supply Water','l-date':'วันที่','l-loc':'Location',
+    'l-seq':'ลำดับ','l-type':'ประเภทแหล่งน้ำ','l-sname':'Sample Name',
+    'l-sw-phys':'Physical / Chemical','l-sw-chem':'Chemistry',
+    'l-cond-sw':'Conductivity','l-th-sw':'Total Hardness',
+    'btn-save-sw':'บันทึก Supply Water →',
+    'l-ct-info':'ข้อมูลตัวอย่าง — Cooling Tower','l-date2':'วันที่','l-cttype':'CT Type',
+    'l-ctloc':'Location','l-ctsname':'Sample Name',
+    'l-swid':'SW Sample ID (เลือกแหล่งน้ำ วันนี้+Location)',
+    'l-ct-phys':'Physical','l-ct-chem':'Chemistry',
+    'l-ct-scale':'Scale & Ions','l-ct-bio':'Biological',
+    'l-rescl':'Residual Cl₂','l-ct-chem2':'Chemical Dosing',
+    'l-ct-sys':'System Status','l-cds':'Hot Water Inlet','l-cdr':'Cold Water Outlet',
+    'l-rt':'Est. RT usage (ton)','l-evap':'Est. Evap','l-blow':'Est. Blowdown','l-makeup':'Est. Make Up',
+    'l-note':'หมายเหตุ','btn-analyze':'วิเคราะห์ด้วย AI →',
+    'l-auto-calc':'ค่าคำนวณอัตโนมัติ','l-sys-status':'System Status',
+    'l-r-rt':'Est. RT usage (ton)','l-r-evap':'Est. Evap Rate','l-r-blow':'Est. Blowdown','l-r-makeup':'Est. Make Up',
+    'l-ai-sum':'สรุปสถานะ','l-ai-leg':'ความเสี่ยง Legionella','l-ai-act':'คำแนะนำ',
+    'btn-report':'ดูรายงานสรุป →','l-rescl2':'Residual Cl₂',
+    'l-rpt-comment':'ข้อเสนอแนะ',
+    'l-send-channel':'เลือกช่องทางส่งออก',
+    'l-email-to':'ถึง (อีเมล)','l-email-subj':'หัวข้อ',
+    'l-sw-log':'Supply Water Log','l-ct-log':'Cooling Tower Log',
+    'l-no-ct':'ยังไม่มีประวัติ CT','l-th-status':'สถานะ',
+    'l-lang-setting':'ภาษา / Language','l-api-keys':'API Keys','l-line-uid':'LINE User ID',
+    'l-limits-ref':'ค่าอ้างอิง','l-data-mgmt':'จัดการข้อมูล','btn-clear':'ล้างข้อมูลทั้งหมด',
+    'nb-sw-l':'Supply','nb-ct-l':'CT Entry','nb-ai-l':'ผล AI','nb-rpt-l':'รายงาน','nb-hist-l':'ประวัติ','nb-cfg-l':'ตั้งค่า',
+    'lang-btn':'EN',
+    // Report
+    'rpt-pass':'ผ่านมาตรฐาน','rpt-warn':'ต้องติดตาม','rpt-fail':'เกินมาตรฐาน',
+    'rpt-pass-sub':'ค่าทุกพารามิเตอร์อยู่ในเกณฑ์ควบคุม',
+    'rpt-warn-sub':'พบค่าที่ต้องเฝ้าระวัง ควรดำเนินการภายใน 24 ชั่วโมง',
+    'rpt-fail-sub':'พบค่าเกินมาตรฐาน ต้องดำเนินการแก้ไขทันที',
+    'lbl-ok':'ผ่าน','lbl-warn':'เฝ้าระวัง','lbl-fail':'เกิน',
+    'lbl-comment':'หมายเหตุ',
+    'send-line':'ส่งรายงานไปยัง LINE →','send-email':'ส่งรายงานทาง Email →',
+    'l-params-title':'รายละเอียดพารามิเตอร์',
+    'l-sel-all':'เลือกทั้งหมด',
+    'l-sel-none':'ล้างการเลือก',
+    'l-send-hint':'กดเลือกรายการแล้วกดส่ง (ไม่เลือก = ส่งทั้งหมด)',
+    'l-btn-edit':'✏️ แก้ไข',
+    'l-sig-title':'ลงนาม / Signature',
+    'l-sig1-name':'ผู้ตรวจสอบ / Inspector',
+    'l-sig1-pos':'ตำแหน่ง / Position',
+    'l-sig1-sign':'ลายเซ็น / Signature',
+    'l-sig2-name':'ผู้รับบริการ / Service Recipient',
+    'l-sig2-pos':'ตำแหน่ง / Position',
+    'btn-sig-clear':'ลบลายเซ็น','btn-sig-save':'บันทึกชื่อ',
+    'l-rh-date':'วันที่','l-rh-loc':'Location / SW',
+    'l-rh-sname':'Sample Name','l-rh-stype':'Sample Type',
+    'l-rh-cond':'Conductivity',
+    'btn-hsel-all':'เลือกทั้งหมด','btn-hsel-none':'ล้างการเลือก',
+    'btn-hsel-send':'ส่งที่เลือก →','btn-hsel-edit':'แก้ไขที่เลือก',
+    'lbl-no-sw-data':'ไม่มีข้อมูล SW',
+    'loading':'กำลังวิเคราะห์...','sending':'กำลังส่ง...',
+  },
+  en: {
+    'tb-title':'Cooling Tower QA','tb-sub':'v13 | PIN | Image | Email History',
+    'l-sw-info':'Sample Info — Supply Water','l-date':'Date','l-loc':'Location',
+    'l-seq':'Seq.','l-type':'Water Source Type','l-sname':'Sample Name',
+    'l-sw-phys':'Physical / Chemical','l-sw-chem':'Chemistry',
+    'l-cond-sw':'Conductivity','l-th-sw':'Total Hardness',
+    'btn-save-sw':'Save Supply Water →',
+    'l-ct-info':'Sample Info — Cooling Tower','l-date2':'Date','l-cttype':'CT Type',
+    'l-ctloc':'Location','l-ctsname':'Sample Name',
+    'l-swid':'SW Sample ID (select source: today + Location)',
+    'l-ct-phys':'Physical','l-ct-chem':'Chemistry',
+    'l-ct-scale':'Scale & Ions','l-ct-bio':'Biological',
+    'l-rescl':'Residual Cl₂','l-ct-chem2':'Chemical Dosing',
+    'l-ct-sys':'System Status','l-cds':'Hot Water Inlet','l-cdr':'Cold Water Outlet',
+    'l-rt':'Est. RT usage (ton)','l-evap':'Est. Evaporation','l-blow':'Est. Blowdown','l-makeup':'Est. Make Up',
+    'l-note':'Notes','btn-analyze':'Analyze with AI →',
+    'l-auto-calc':'Auto-calculated Values','l-sys-status':'System Status',
+    'l-r-rt':'Est. RT usage (ton)','l-r-evap':'Est. Evap Rate','l-r-blow':'Est. Blowdown','l-r-makeup':'Est. Make Up',
+    'l-ai-sum':'Status Summary','l-ai-leg':'Legionella Risk','l-ai-act':'Recommendations',
+    'btn-report':'View Full Report →','l-rescl2':'Residual Cl₂',
+    'l-rpt-comment':'Recommendation',
+    'l-send-channel':'Select Output Channel',
+    'l-email-to':'To (Email)','l-email-subj':'Subject',
+    'l-sw-log':'Supply Water Log','l-ct-log':'Cooling Tower Log',
+    'l-no-ct':'No CT history yet','l-th-status':'Status',
+    'l-lang-setting':'Language / ภาษา','l-api-keys':'API Keys','l-line-uid':'LINE User ID',
+    'l-limits-ref':'Limits Reference','l-data-mgmt':'Data Management','btn-clear':'Clear All Data',
+    'nb-sw-l':'Supply','nb-ct-l':'CT Entry','nb-ai-l':'AI Result','nb-rpt-l':'Report','nb-hist-l':'History','nb-cfg-l':'Settings',
+    'lang-btn':'TH',
+    'rpt-pass':'All Pass','rpt-warn':'Warning','rpt-fail':'Action Required',
+    'rpt-pass-sub':'All parameters within control limits',
+    'rpt-warn-sub':'Some parameters need attention within 24 hours',
+    'rpt-fail-sub':'Parameters exceed limits — immediate action required',
+    'lbl-ok':'PASS','lbl-warn':'WARN','lbl-fail':'FAIL',
+    'lbl-comment':'Comment',
+    'send-line':'Send Report via LINE →','send-email':'Send Report via Email →',
+    'l-params-title':'Parameter Details',
+    'l-sel-all':'Select All',
+    'l-sel-none':'Clear',
+    'l-send-hint':'Select items above then send (or select none = send all)',
+    'l-btn-edit':'✏️ Edit',
+    'l-sig-title':'Signature',
+    'l-sig1-name':'Inspector',
+    'l-sig1-pos':'Position',
+    'l-sig1-sign':'Signature',
+    'l-sig2-name':'Service Recipient',
+    'l-sig2-pos':'Position',
+    'btn-sig-clear':'Clear Signature','btn-sig-save':'Save Name',
+    'l-rh-date':'Date','l-rh-loc':'Location / SW',
+    'l-rh-sname':'Sample Name','l-rh-stype':'Sample Type',
+    'l-rh-cond':'Conductivity',
+    'btn-hsel-all':'Select All','btn-hsel-none':'Clear',
+    'btn-hsel-send':'Send Selected →','btn-hsel-edit':'Edit Selected',
+    'lbl-no-sw-data':'No SW data',
+    'loading':'Analyzing...','sending':'Sending...',
+  }
+};
+
+let LANG = localStorage.getItem('ct_lang') || 'th';
+
+function t(key){ return (T[LANG][key]) || T['th'][key] || key; }
+
+function applyLang(){
+  // update all elements with id matching translation keys
+  Object.keys(T[LANG]).forEach(key => {
+    const el = document.getElementById(key);
+    if(!el) return;
+    if(el.tagName==='BUTTON'||el.tagName==='INPUT') el.value=T[LANG][key];
+    else el.textContent=T[LANG][key];
+  });
+  // special: swid label
+  const swid_el=document.querySelector('[id="l-swid"]');
+  if(swid_el) swid_el.textContent=t('l-swid');
+  // lang toggle active
+  document.getElementById('lang-th').classList.toggle('active',LANG==='th');
+  document.getElementById('lang-en').classList.toggle('active',LANG==='en');
+  document.getElementById('lang-btn').textContent=t('lang-btn');
+  // empty state
+  const noct=document.getElementById('l-no-ct');
+  if(noct) noct.textContent=t('l-no-ct');
+  // update send button
+  updateSendBtn();
+}
+
+function setLang(l){ LANG=l; localStorage.setItem('ct_lang',l); applyLang(); }
+function toggleLang(){ setLang(LANG==='th'?'en':'th'); }
+
+// ══════════════════════════════════════════════════
+// State
+// ══════════════════════════════════════════════════
+let swLog = JSON.parse(localStorage.getItem('sw_log16')||'[]');
+let ctLog = JSON.parse(localStorage.getItem('ct_log16')||'[]');
+let lastV  = {};  // last analyzed CT values
+let lastOv = 'ok';
+
+function g(id){ return document.getElementById(id); }
+function gv(id){ return parseFloat(g(id).value)||0; }
+function gvs(id){ return (g(id).value||'').trim(); }
+
+function sw_nav(n){
+  document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  g('s-'+n).classList.add('on');
+  if(g('nb-'+n)) g('nb-'+n).classList.add('on');
+  if(n==='report') buildReport();
+}
+
+// ══════════════════════════════════════════════════
+// CT type
+// ══════════════════════════════════════════════════
+const CT_ABR={Standard:'STD',Evaporative:'EVP',Ammonia:'AMM',Absorption:'ABS'};
+const CT_FAC={Standard:0.227*3,Evaporative:0.227*3.5,Ammonia:0.227*3.75,Absorption:0.227*4.5};
+
+function onCTType(){ updateCTID(); calcSysAuto(); }
+function updateCTID(){
+  const loc=gvs('ct-loc')||'LOC'; const type=gvs('ct-type');
+  const abbr=CT_ABR[type]||'STD';
+  const date=gvs('ct-date')||new Date().toISOString().split('T')[0];
+  const seq=ctLog.filter(r=>r.loc===loc&&r.ctype===type&&r.date===date).length+1;
+  g('ct-id').value=`CT-${loc}-${abbr}-${String(seq).padStart(2,'0')}`;
+}
+
+// ══════════════════════════════════════════════════
+// SW type limits
+// ══════════════════════════════════════════════════
+const SW_LIM={
+  Municipal:  {cond:1000,th:150,alk:300,condLbl:'<1,000',thLbl:'<150 mg/L',alkLbl:'<300 mg/L',note:'',noteBg:''},
+  'Well Water':{cond:1000,th:150,alk:300,condLbl:'<1,000',thLbl:'<150 mg/L',alkLbl:'<300 mg/L',note:'',noteBg:''},
+  'Soft Water':{cond:1000,th:10, alk:300,condLbl:'<1,000',thLbl:'⚠️ <10 mg/L',alkLbl:'<300 mg/L',note:'Soft Water: TH limit → <10 mg/L',noteBg:'#F3E5F5',noteCol:'#4A235A'},
+  'RO Water':  {cond:40,  th:10, alk:50, condLbl:'⚠️ <40',thLbl:'⚠️ <10 mg/L',alkLbl:'⚠️ <50 mg/L',note:'RO Water: Cond<40 | TH<10 | Alk<50',noteBg:'#E3F2FD',noteCol:'#0D47A1'},
+  Other:       {cond:1000,th:150,alk:300,condLbl:'<1,000',thLbl:'<150 mg/L',alkLbl:'<300 mg/L',note:'',noteBg:''},
+};
+function onSwType(){
+  const t_=gvs('sw-type'); const lim=SW_LIM[t_]||SW_LIM.Municipal;
+  g('sw-cond-lim').textContent=lim.condLbl;
+  g('sw-th-lim').textContent=lim.thLbl;
+  g('sw-alk-lim').textContent=lim.alkLbl;
+  const note=g('sw-type-note');
+  if(lim.note){ note.style.display='block'; note.textContent=lim.note;
+    note.style.background=lim.noteBg; note.style.color=lim.noteCol;
+    note.style.border=`1px solid ${t_==='RO Water'?'#90CAF9':'#CE93D8'}`; }
+  else note.style.display='none';
+  calcSWAuto();
+}
+
+// ══════════════════════════════════════════════════
+// Auto-calc
+// ══════════════════════════════════════════════════
+function updateSWID(){
+  const d=gvs('sw-date'); const code=gvs('sw-loc')||'XX';
+  if(!d) return;
+  const dt=new Date(d);
+  const dd=String(dt.getDate()).padStart(2,'0');
+  const mm=String(dt.getMonth()+1).padStart(2,'0');
+  const yy=String(dt.getFullYear()).slice(2);
+  const seq=swLog.filter(r=>r.date===d&&r.locCode===code).length+1;
+  g('sw-seq').value=String(seq).padStart(2,'0');
+  g('sw-sid').value=`SW-${dd}${mm}${yy}-${code}-${String(seq).padStart(2,'0')}`;
+}
+function calcSWAuto(){
+  const cond=gv('sw-cond'),th=gv('sw-th');
+  g('sw-tds').value=cond>0?(cond*0.75).toFixed(1):'';
+  g('sw-cah').value=th>0?(th*0.70).toFixed(1):'';
+}
+
+function calcCTAuto(){
+  const cond=gv('ct-cond'),th=gv('ct-th'),alk=gv('ct-alk'),ph=gv('ct-ph'),tmp=gv('ct-tmp');
+  g('ct-tds').value=cond>0?(cond*0.75).toFixed(1):'';
+  const caH=th>0?th*0.7:0; g('ct-cah').value=caH>0?caH.toFixed(1):'';
+  let phEst=null;
+  if(alk>0){ phEst=Math.log10(alk*0.02)+6.35; g('ct-phest').value=phEst.toFixed(2); }
+  else g('ct-phest').value='';
+  const tds=cond*0.75;
+  if(cond>0&&caH>0&&alk>0&&tmp>0&&ph>0){
+    // Langelier: pH_s = 9.3 + A + B - C - D
+    // A=(LOG10(TDS)-1)/10, B=-13.12*LOG10(T+273)+34.55, C=LOG10(CaH)-0.4, D=LOG10(Alk)
+    const pHs=9.3+(Math.log10(tds)-1)/10+(-13.12*Math.log10(tmp+273)+34.55)-Math.log10(caH)+0.4-Math.log10(alk);
+    const l1=ph-pHs, l2=phEst!==null?phEst-pHs:l1;
+    const mn=Math.min(l1,l2), mx=Math.max(l1,l2);
+    g('lsi-mn').textContent=mn.toFixed(2); g('lsi-mx').textContent=mx.toFixed(2);
+    g('lsi-note').textContent=mx>0.5?'⚠️ เสี่ยง Scale / Scaling Risk':mn<-0.5?'⚠️ เสี่ยง Corrosion / Corrosion Risk':'✅ สมดุลดี / Balanced';
+    return {phEst,caH,tds,lsiMin:mn,lsiMax:mx,lsiStr:mn.toFixed(2)+' – '+mx.toFixed(2),pHs};
+  } else {
+    g('lsi-mn').textContent='—'; g('lsi-mx').textContent='—';
+    g('lsi-note').textContent=LANG==='th'?'ข้อมูลยังไม่ครบ':'Incomplete data'; return null;
+  }
+}
+
+function calcSysAuto(){
+  const type=gvs('ct-type'), factor=CT_FAC[type]||CT_FAC.Standard;
+  const recirc=gv('ct-recirc'),tin=gv('ct-tin'),tout=gv('ct-tout');
+  const rt=recirc>0?recirc/factor:null;
+  const evap=(recirc>0&&tin>tout)?0.00085*(tin-tout)*recirc:null;
+  g('ct-rt').value=rt!==null?rt.toFixed(1)+' ton':'';
+  g('ct-evap').value=evap!==null?evap.toFixed(2)+' m³/hr':'';
+  updateBlow();
+}
+function updateBlow(){
+  const evapStr=gvs('ct-evap'); const evap=parseFloat(evapStr);
+  const swid=gvs('ct-swid'),ctCond=gv('ct-cond'),swCond=getSWCond(swid);
+  let blow=null;
+  if(evap>0&&swCond&&ctCond&&ctCond/swCond>1){
+    const coc=ctCond/swCond; blow=evap/(coc-1);
+    g('ct-blow').value=blow.toFixed(2)+' m³/hr';
+  } else g('ct-blow').value=swCond?'รอ CoC...':'เลือก SW ก่อน';
+  if(evap>0&&blow!==null&&blow>0){
+    const tot=evap+blow;
+    g('ct-makeup').value=(tot*1.05).toFixed(2)+' – '+(tot*1.10).toFixed(2)+' m³/hr';
+  } else if(g('ct-makeup')) g('ct-makeup').value='รอ Evap+CoC...';
+}
+
+// ══════════════════════════════════════════════════
+// CoC
+// ══════════════════════════════════════════════════
+function getSWCond(swid){ const r=swLog.find(x=>x.sid===swid); return r?r.cond:null; }
+function getSWRec(swid){ return swLog.find(x=>x.sid===swid)||null; }
+function cocSt(c){ return c>8.0?'bad':c<2.0?'warn':'ok'; }
+function updateCoCLive(){
+  const swid=gvs('ct-swid'),ctCond=gv('ct-cond'),swCond=getSWCond(swid);
+  if(swCond&&ctCond){
+    const coc=ctCond/swCond; const s=cocSt(coc);
+    g('coc-v').textContent=coc.toFixed(2)+'×';
+    g('coc-f').textContent=`CT ${ctCond} ÷ SW ${swCond}`;
+    g('coc-bl').innerHTML=`<span class="badge b-${s==='ok'?'coc':s==='warn'?'wn':'bd'}"><span class="bdot"></span>${s==='ok'?'NORMAL ✓':s==='warn'?'LOW ▼':'HIGH ▲'}</span>`;
+    g('coc-live').style.display='block'; updateBlow();
+  } else g('coc-live').style.display='none';
+}
+function onSWIDSel(){
+  const swid=gvs('ct-swid'); const r=getSWRec(swid);
+  const bar=g('sw-info');
+  if(r){ bar.style.display='block'; bar.textContent=`${r.sid} | Cond:${r.cond} | pH:${r.ph} | ${r.type}`; }
+  else bar.style.display='none';
+  updateCoCLive();
+}
+function refreshLocDDL(){
+  const locs=[...new Set(swLog.map(r=>r.locCode).filter(Boolean))];
+  const sel=g('ct-loc'); const cur=sel.value;
+  sel.innerHTML='<option value="">-- เลือก --</option>'+
+    locs.map(l=>`<option value="${l}"${l===cur?' selected':''}>${l}</option>`).join('');
+}
+function refreshCT(){
+  refreshLocDDL();
+  const date=gvs('ct-date')||new Date().toISOString().split('T')[0];
+  const loc=gvs('ct-loc');
+  const items=swLog.filter(r=>r.date===date&&(!loc||r.locCode===loc));
+  const sel=g('ct-swid');
+  sel.innerHTML='<option value="">-- เลือก SW ID --</option>'+
+    items.map(r=>`<option value="${r.sid}">${r.sid} | ${r.cond} µS/cm | ${r.type}</option>`).join('');
+  g('sw-info').style.display='none'; g('coc-live').style.display='none';
+  updateCTID();
+}
+
+// ══════════════════════════════════════════════════
+// Save SW
+// ══════════════════════════════════════════════════
+function saveSW(){
+  const date=gvs('sw-date'),code=gvs('sw-loc');
+  if(!date||!code){ alert(LANG==='th'?'กรุณาเลือกวันที่และกรอก Location':'Please select date and enter Location'); return; }
+  if(code.length>10){ alert('Location ต้องไม่เกิน 10 อักษร'); return; }
+  updateSWID(); calcSWAuto();
+  const sid=gvs('sw-sid'),type=gvs('sw-type');
+  const cond=gv('sw-cond'),ph=gv('sw-ph'),tur=gv('sw-tur'),fe=gv('sw-fe');
+  const th=gv('sw-th'),alk=gv('sw-alk'),tds=parseFloat(g('sw-tds').value)||0,cah=parseFloat(g('sw-cah').value)||0;
+  const lim=SW_LIM[type]||SW_LIM.Municipal;
+  const bads=[];
+  if(ph<6.5||ph>7.5)bads.push('pH');
+  if(cond>lim.cond)bads.push('Cond');
+  if(tur>10)bads.push('Turb');
+  if(th>lim.th)bads.push('TH');
+  if(alk>lim.alk)bads.push('Alk');
+  if(fe>1.0)bads.push('Fe');
+  const status=bads.length>0?'FAIL':(cond>lim.cond*0.8||tur>5||th>lim.th*0.85||alk>lim.alk*0.85)?'WARN':'PASS';
+  swLog.push({sid,date,locCode:code,type,name:gvs('sw-name'),tmp:gv('sw-tmp'),ph,cond,tur,tds,th,cah,alk,fe,status});
+  localStorage.setItem('sw_log16',JSON.stringify(swLog));
+  g('ct-date').value=date; refreshCT(); sw_nav('ct');
+  setTimeout(()=>{refreshLocDDL();refreshCT();},100);
+  alert(`✅ ${sid} (${type})\nTDS Est: ${tds} | CaH Est: ${cah} | ${status}`);
+}
+
+// ══════════════════════════════════════════════════
+// CT Parameter check
+// ══════════════════════════════════════════════════
+const L={
+  ph:{lo:7.0,hi:8.5,unit:'',label:'pH',limTxt:'7.0–8.5'},
+  cond:{lo:1000,hi:2500,unit:'µS/cm',label:'Conductivity',limTxt:'1,000–2,500'},
+  tur:{lo:0,hi:10,unit:'NTU',label:'Turbidity',limTxt:'<10'},
+  rescl:{lo:0.2,hi:1.0,unit:'ppm',label:'Residual Cl₂',limTxt:'0.2–1.0'},
+  orp:{lo:300,hi:600,unit:'mV',label:'ORP',limTxt:'300–600'},
+  tbc:{lo:0,hi:10000,unit:'CFU/mL',label:'TBC Count',limTxt:'<10,000'},
+  sio2:{lo:0,hi:150,unit:'mg/L',label:'Silica',limTxt:'<150'},
+  coc:{lo:2.0,hi:8.0,unit:'×',label:'CoC',limTxt:'2.0–8.0'},
+  lsi:{lo:-0.5,hi:0.5,unit:'',label:'LSI',limTxt:'–0.5–+0.5'},
+  cl:{lo:0,hi:300,unit:'mg/L',label:'Chloride',limTxt:'<300'},
+  so4:{lo:0,hi:500,unit:'mg/L',label:'Sulfate',limTxt:'<500'},
+};
+const FC={ok:'#1E8449',warn:'#F0A500',bad:'#E74C3C'};
+
+function chk(k,v){
+  const l=L[k]; if(!l)return 'ok';
+  if(k==='rescl')return v>=l.lo&&v<=l.hi?'ok':v<0.1?'bad':'warn';
+  if(k==='orp')  return v===0?'ok':v>=l.lo?'ok':v>=250?'warn':'bad';
+  if(k==='tbc')  return v===0?'ok':v<=l.hi?'ok':v<=l.hi*2?'warn':'bad';
+  if(k==='ph')   return v>=l.lo&&v<=l.hi?'ok':(v<6.5||v>9)?'bad':'warn';
+  if(k==='cond') return v>=l.lo&&v<=l.hi?'ok':v>2800?'bad':'warn';
+  if(k==='coc')  return v>=l.lo&&v<=l.hi?'ok':v>l.hi?'bad':'warn';
+  if(k==='lsi'){
+    if(v===null||v===undefined) return 'ok';
+    if(Math.abs(v)<=0.2) return 'ok';        // balanced ±0.2
+    if(Math.abs(v)<=0.5) return 'warn';       // slight tendency
+    return 'bad';                               // strong tendency
+  }
+  return v<=l.hi?'ok':v<=l.hi*1.2?'warn':'bad';
+}
+function pct(k,v){
+  if(k==='ph') return ((v-6.5)/3)*100;
+  if(k==='coc')return ((v-1)/9)*100;
+  if(k==='rescl')return (v/1.5)*100;
+  if(k==='orp')return (v/700)*100;
+  if(k==='lsi')return ((v+1)/2)*100;
+  const l=L[k]; return l?(v/(l.hi||1))*100:50;
+}
+function fmtS(k,v){ return chk(k,v)==='ok'?'✅':chk(k,v)==='warn'?'⚠️':'❌'; }
+
+// Comment generator per parameter
+function paramComment(k, v, s) {
+  const th = LANG==='th';
+  if(s==='ok') return th?'อยู่ในเกณฑ์ควบคุม':'Within control limit';
+  const comments = {
+    ph: {warn: th?'ค่า pH ใกล้ขอบเขต ตรวจสอบการเติมสารเคมี':'pH near boundary, check chemical dosing', bad: th?'ค่า pH เกินเกณฑ์ ปรับแก้ทันที':'pH out of range, adjust immediately'},
+    cond:{warn:th?'Conductivity สูง ควรเพิ่ม Blowdown':'High conductivity, increase blowdown', bad:th?'Conductivity เกินมาตรฐาน ตรวจสอบ CoC':'Conductivity exceeds limit, check CoC'},
+    tur: {warn:th?'ความขุ่นสูง ตรวจสอบระบบกรอง':'Turbidity high, check filtration', bad:th?'ความขุ่นเกินเกณฑ์ ล้างตะกอนทันที':'Turbidity exceeds limit, flush basin'},
+    rescl:{warn:th?'Cl₂ อาจไม่เพียงพอ ตรวจสอบระบบจ่ายคลอรีน':'Cl₂ may be insufficient, check dosing', bad:th?'Cl₂ ต่ำมาก เสี่ยง Legionella Shock dose ทันที':'Cl₂ critically low, Legionella risk — shock dose immediately'},
+    orp: {warn:th?'ORP ต่ำ ประสิทธิภาพ biocide อาจลดลง':'ORP low, biocide efficacy may be reduced', bad:th?'ORP ต่ำมาก ตรวจสอบ biocide':'ORP critically low, check biocide'},
+    tbc: {warn:th?'TBC สูง เพิ่มความถี่การตรวจ':'TBC elevated, increase monitoring frequency', bad:th?'TBC เกินเกณฑ์ Shock dose และ ทำความสะอาด basin':'TBC exceeds limit, shock dose and clean basin'},
+    sio2:{warn:th?'Silica ใกล้ขอบเขต ระวัง Scale':'Silica near limit, scale risk', bad:th?'Silica เกินมาตรฐาน ลด CoC':'Silica exceeds limit, reduce CoC'},
+    coc: {warn:th?'CoC ต่ำ อาจสิ้นเปลืองน้ำ':'CoC low, may waste water', bad:th?'CoC สูงเกินไป เสี่ยง Scale ปรับ Blowdown':'CoC too high, scaling risk — adjust blowdown'},
+    lsi: {warn:th?'LSI ใกล้ขอบเขต ติดตาม Scale/Corrosion':'LSI near boundary, monitor scaling/corrosion', bad:th?'LSI เกินเกณฑ์ ปรับ pH/Hardness/Alkalinity':'LSI out of range, adjust pH/Hardness/Alkalinity'},
+    cl:  {warn:th?'Chloride ใกล้ขอบเขต เสี่ยง Corrosion':'Chloride near limit, corrosion risk', bad:th?'Chloride เกินมาตรฐาน ลด CoC':'Chloride exceeds limit, reduce CoC'},
+    so4: {warn:th?'Sulfate ใกล้ขอบเขต':'Sulfate near limit', bad:th?'Sulfate เกินมาตรฐาน เพิ่ม Inhibitor':'Sulfate exceeds limit, increase inhibitor'},
+  };
+  return (comments[k]&&comments[k][s])||'—';
+}
+
+// ══════════════════════════════════════════════════
+// Analyze
+// ══════════════════════════════════════════════════
+async function analyze(){
+  const lsiData=calcCTAuto(); calcSysAuto();
+  const swid=gvs('ct-swid'),ctCond=gv('ct-cond'),swCond=getSWCond(swid);
+  const ctype=gvs('ct-type');
+  const rtVal=parseFloat(gvs('ct-rt'));
+  const evapVal=parseFloat(gvs('ct-evap'));
+  const blowVal=parseFloat(gvs('ct-blow'));
+  const mkupStr=gvs('ct-makeup');
+
+  const v={
+    tmp:gv('ct-tmp'),ph:gv('ct-ph'),cond:ctCond,tur:gv('ct-tur'),tds:ctCond*0.75,
+    th:gv('ct-th'),alk:gv('ct-alk'),fe:gv('ct-fe'),
+    cl:gv('ct-cl'),so4:gv('ct-so4'),sio2:gv('ct-sio2'),
+    rescl:gv('ct-rescl'),orp:gv('ct-orp'),tbc:gv('ct-tbc'),
+    recirc:gv('ct-recirc'),tin:gv('ct-tin'),tout:gv('ct-tout'),sci:gv('ct-sci'),bio:gv('ct-bio'),
+    ctype,rt:isNaN(rtVal)?null:rtVal,
+    evap:isNaN(evapVal)?null:evapVal,blow:isNaN(blowVal)?null:blowVal,makeup:mkupStr,
+    phEst:lsiData?lsiData.phEst:null,caH:lsiData?lsiData.caH:gv('ct-th')*0.7,
+    lsiMin:lsiData?lsiData.lsiMin:null,lsiMax:lsiData?lsiData.lsiMax:null,
+    lsiStr:lsiData?lsiData.lsiStr:'—',pHs:lsiData?lsiData.pHs:null,
+    coc:swCond?ctCond/swCond:null,swCond,swid,
+    swRec: getSWRec(swid),
+  };
+  const note=gvs('ct-note'),name=gvs('ct-name'),ctid=gvs('ct-id'),loc=gvs('ct-loc');
+  const date=gvs('ct-date')||new Date().toISOString().split('T')[0];
+
+  g('lTxt').textContent=t('loading'); g('lOver').classList.add('on');
+  lastV={...v,note,name,ctid,loc,date};
+
+  // fill AI screen
+  g('d-ph').textContent=v.ph.toFixed(1); g('d-cond').textContent=v.cond;
+  g('d-rescl').textContent=v.rescl.toFixed(2); g('d-tbc').textContent=v.tbc.toLocaleString();
+  g('r-tds').textContent=v.tds.toFixed(0)+' mg/L';
+  g('r-ph').textContent=v.phEst!==null?v.phEst.toFixed(2):'—';
+  g('r-cah').textContent=v.caH.toFixed(0)+' mg/L CaCO₃';
+  g('r-lsi').textContent=v.lsiStr;
+  g('r-type').textContent=ctype+' ('+CT_ABR[ctype]+')';
+  g('r-rt').textContent=v.rt!==null?v.rt.toFixed(1)+' ton':'—';
+  g('r-evap').textContent=v.evap!==null?v.evap.toFixed(2)+' m³/hr':'—';
+  g('r-blow').textContent=v.blow!==null&&!isNaN(v.blow)?v.blow.toFixed(2)+' m³/hr':'—';
+  const mkup_el=g('r-makeup');
+  if(mkup_el&&v.evap!==null&&v.blow!==null&&!isNaN(v.blow)&&v.blow>0){
+    const tot=v.evap+v.blow;
+    mkup_el.textContent=(tot*1.05).toFixed(2)+' – '+(tot*1.10).toFixed(2)+' m³/hr';
+  } else if(mkup_el) mkup_el.textContent='—';
+
+  if(v.coc!==null){
+    g('ai-coc').textContent=v.coc.toFixed(2)+'×'; g('ai-coc-d').textContent=`CT ${v.cond} ÷ SW ${v.swCond}`;
+    const cs=cocSt(v.coc);
+    g('ai-coc-b').innerHTML=`<span class="badge b-${cs==='ok'?'coc':cs==='warn'?'wn':'bd'}"><span class="bdot"></span>${cs==='ok'?'NORMAL ✓':cs==='warn'?'LOW ▼':'HIGH ▲'}</span>`;
+  } else { g('ai-coc').textContent=t('lbl-no-sw-data'); g('ai-coc-d').textContent=''; g('ai-coc-b').innerHTML=''; }
+
+  const bkK=['ph','cond','tur','rescl','sio2','cl']; if(v.coc!==null)bkK.push('coc');
+  if(v.lsiMin!==null) bkK.push('lsi');
+  g('bars').innerHTML=bkK.map(k=>{
+    const val=k==='coc'?v.coc:k==='lsi'?(v.lsiMax):v[k];
+    const s=chk(k,val); const p=Math.max(2,Math.min(100,pct(k,val))).toFixed(0);
+    const disp=k==='coc'?val.toFixed(2)+'×':k==='tbc'?val.toLocaleString():k==='lsi'?v.lsiStr:typeof val==='number'&&val%1!==0?val.toFixed(2):val;
+    return `<div class="prow"><div class="prow-h"><span>${L[k]?L[k].label:k}</span><span class="pv">${disp} ${L[k]?L[k].unit:''}</span></div>
+      <div class="ptrack"><div class="pfill" style="width:${p}%;background:${FC[s]}"></div></div></div>`;
+  }).join('');
+
+  const allK=['ph','cond','tur','rescl','sio2']; if(v.coc!==null)allK.push('coc');
+  const bads=allK.filter(k=>chk(k,k==='coc'?v.coc:v[k])==='bad');
+  const warns=allK.filter(k=>chk(k,k==='coc'?v.coc:v[k])==='warn');
+  const ov=bads.length>0?'bad':warns.length>0?'warn':'ok';
+  lastOv=ov;
+  g('ai-badge').innerHTML=`<span class="badge b-${ov}"><span class="bdot"></span>${ov==='ok'?t('rpt-pass'):ov==='warn'?t('rpt-warn'):t('rpt-fail')} — ${name} [${loc}] ${date}</span>`;
+
+  const apiKey=g('cfg-ant').value||'';
+  let res;
+  try{
+    if(apiKey.startsWith('sk-ant')){
+      res=await callClaude(apiKey,v,bads,warns,note,name,ctid,loc,date);
+    } else {
+      res=ruleAI(v,bads,warns,note,name,ctid,loc,date,ov);
+    }
+  }catch(e){
+    console.warn('Analysis fallback:',e.message);
+    res=ruleAI(v,bads,warns,note,name,ctid,loc,date,ov);
+  }finally{
+    g('lOver').classList.remove('on'); // always hide loading
+  }
+
+  g('ai-sum').textContent=res.sum; g('ai-leg').textContent=res.leg;
+  g('ai-trend').textContent=res.trend; g('ai-act').textContent=res.act;
+  lastV._aiRes=res;
+
+  const rPin=getReportPin();
+  ctLog.unshift({date,ctid,ctype,loc,name,swid,ph:v.ph,cond:v.cond,tds:v.tds,
+    phEst:v.phEst,caH:v.caH,lsiStr:v.lsiStr,coc:v.coc,rt:v.rt,evap:v.evap,blow:v.blow,
+    rescl:v.rescl,tbc:v.tbc,ov,note,
+    pin:rPin||null,
+    imgCount:reportImages.length});
+  if(ctLog.length>100)ctLog.pop();
+  localStorage.setItem('ct_log16',JSON.stringify(ctLog));
+  sw_nav('ai');
+}
+
+// ══════════════════════════════════════════════════
+// BUILD REPORT — Checkbox Item List
+// ══════════════════════════════════════════════════
+let rptItems = [];        // all report item objects
+let selectedItems = new Set(); // indices of selected items
+let editedComment = null; // user-edited comment override
+
+// ── LSI Tendency Helpers ──────────────────────────
+function lsiTendencyStr(lsiMin, lsiMax, fallback){
+  if(lsiMin===null||lsiMax===null) return fallback||'ข้อมูลยังไม่ครบ';
+  const th=LANG==='th';
+  const mid=(lsiMin+lsiMax)/2;
+  // Describe tendency based on midpoint
+  let tendency='';
+  if(mid < -1.0)      tendency=th?'กัดกร่อนสูงมาก (High Corrosive)':'High Corrosive';
+  else if(mid < -0.5) tendency=th?'แนวโน้มกัดกร่อน (Corrosive)':'Corrosive Tendency';
+  else if(mid < -0.2) tendency=th?'กัดกร่อนเล็กน้อย (Slight Corrosive)':'Slightly Corrosive';
+  else if(mid <=  0.2) tendency=th?'สมดุล (Balanced)':'Balanced';
+  else if(mid <=  0.5) tendency=th?'เกิดตะกรันเล็กน้อย (Slight Scale)':'Slightly Scale-forming';
+  else if(mid <=  1.0) tendency=th?'แนวโน้มเกิดตะกรัน (Scale Forming)':'Scale Forming';
+  else                  tendency=th?'เกิดตะกรันสูงมาก (High Scale)':'High Scale';
+  return fallback+' → '+tendency;
+}
+
+function lsiTendencyLimit(lsiMin, lsiMax){
+  if(lsiMin===null||lsiMax===null) return '—';
+  const th=LANG==='th';
+  // Show whether both values are in safe zone or not
+  const mid=(lsiMin+lsiMax)/2;
+  if(Math.abs(mid)<=0.2) return th?'เกณฑ์: สมดุล':'Target: Balanced (0)';
+  return th?'เกณฑ์: ±0.5 จาก 0':'Target: ±0.5 from 0';
+}
+
+function buildReport(){
+  const v=lastV; if(!v||!v.ph) return;
+  const th=LANG==='th';
+  const date=v.date, name=v.name||'—', loc=v.loc||'—', ctid=v.ctid||'—', ctype=v.ctype||'—';
+
+  // Header — new structured layout
+  g('rpt-title').textContent=th?'รายงานคุณภาพน้ำ — Cooling Tower':'Water Quality Report — Cooling Tower';
+  // Row 1: Date / Location / Sample Name / Sample Type
+  g('rpt-date').textContent=date||'—';
+  g('rpt-loc').textContent=(loc||'—')+( v.swid?' | SW: '+v.swid:'');
+  g('rpt-sname').textContent=name||'—';
+  g('rpt-stype').textContent=(ctype||'—')+' ('+( CT_ABR[ctype]||'—')+')';
+  // Row 2: KPIs
+  g('rpt-cond').textContent=v.cond?v.cond.toLocaleString():'—';
+  g('rpt-coc').textContent=v.coc!==null?v.coc.toFixed(2):'—';
+  const lsiOv=v.lsiMin!==null?(v.lsiMax>0.5?'⚠️ Scale':v.lsiMin<-0.5?'⚠️ Corrosion':'✅ OK'):'—';
+  g('rpt-lsi').textContent=v.lsiStr;
+  g('rpt-lsi-note').textContent=lsiOv;
+
+  // Overall status
+  const ovEl=g('rpt-ov');
+  ovEl.className='rpt-ov '+lastOv;
+  g('rpt-ov-icon').textContent=lastOv==='ok'?'✅':lastOv==='warn'?'⚠️':'🚨';
+  g('rpt-ov-text').textContent=t('rpt-'+lastOv);
+  g('rpt-ov-sub').textContent=t('rpt-'+lastOv+'-sub');
+
+  // Build item list
+  rptItems = [];
+  const def=(k,val,auto,label,limTxt,unit,vStr)=>{
+    let s='ok', vd=vStr||'—';
+    if(k&&L[k]){
+      s=chk(k,val);
+      if(vStr){ vd=vStr; }  // explicit vStr always wins
+      else if(val===0&&(k==='orp'||k==='tbc')){ vd='0 '+(L[k].unit||''); }
+      else { vd=(typeof val==='number'?val.toLocaleString():val)+' '+(L[k].unit||''); }
+    }
+    const lim=limTxt||(k&&L[k]?L[k].limTxt:'—');
+    const lbl=label||(k&&L[k]?L[k].label:k)||'—';
+    const cmt=k?paramComment(k,val,s):(auto?(th?'คำนวณอัตโนมัติ':'Auto-calculated'):'');
+    return {k,val,s,vd,lim,lbl,auto,cmt};
+  };
+
+  const sections=[
+    {sec:th?'Physical Parameters':'พารามิเตอร์ทางกายภาพ', items:[
+      def('ph',v.ph,false),
+      def('cond',v.cond,false),
+      def('tur',v.tur,false),
+      def('lsi',v.lsiMax,true,th?'LSI Range (Langelier)':'LSI Range',lsiTendencyLimit(v.lsiMin,v.lsiMax),'',lsiTendencyStr(v.lsiMin,v.lsiMax,v.lsiStr)),
+    ]},
+    {sec:th?'Chemistry & Scale':'เคมีและ Scale', items:[
+      def('cl',v.cl,false),
+      def('so4',v.so4,false),
+      def('sio2',v.sio2,false),
+      def('coc',v.coc!==null?v.coc:0,true,'CoC','2.0–8.0','×',v.coc!==null?v.coc.toFixed(2)+'×':(th?'ไม่มี SW':'No SW')),
+    ]},
+    {sec:th?'Biological':'ชีวภาพ', items:[
+      def('rescl',v.rescl,false),
+      def('orp',v.orp,false),
+      def('tbc',v.tbc,false),
+    ]},
+    {sec:th?'Auto-calculated (ค่าคำนวณ)':'Auto-calculated', items:[
+      def(null,v.tds,true,'TDS Est. (Cond×0.75)','—','mg/L',v.tds.toFixed(0)+' mg/L'),
+      def(null,v.phEst,true,'pH Est. (Langelier)','7.0–8.5','',v.phEst?v.phEst.toFixed(2):'—'),
+      def(null,v.caH,true,'Ca Hardness Est. (TH×0.7)','—','mg/L',v.caH.toFixed(0)+' mg/L CaCO₃'),
+    ]},
+    {sec:th?'System Status (สถานะระบบ)':'System Status', items:[
+      def(null,v.rt,true,'Est. RT usage (ton)','—','ton',v.rt!==null?v.rt.toFixed(1)+' ton':'—'),
+      def(null,v.evap,true,'Est. Evaporation (0.00085×ΔT×Recirc)','—','m³/hr',v.evap!==null?v.evap.toFixed(2)+' m³/hr':'—'),
+      def(null,v.blow,true,'Est. Blowdown (Evap÷(CoC−1))','—','m³/hr',v.blow!==null&&!isNaN(v.blow)?v.blow.toFixed(2)+' m³/hr':'—'),
+      def(null,0,true,'Est. Make Up (±5–10%)','—','m³/hr',v.makeup||'—'),
+    ]},
+  ];
+
+  // Flatten to item list
+  rptItems=[];
+  sections.forEach(sec=>{
+    rptItems.push({type:'section',sec:sec.sec});
+    sec.items.forEach(item=>rptItems.push({type:'item',...item}));
+  });
+
+  // Default: select all non-ok items + all items
+  selectedItems=new Set(rptItems.map((_,i)=>i));
+
+  renderRptList();
+
+  // AI comment
+  const aiRes=v._aiRes;
+  const commentText=(aiRes&&aiRes.sum?aiRes.sum:'')+(aiRes&&aiRes.act?'\n\n'+(th?'คำแนะนำ: ':'Recommendations: ')+aiRes.act:'');
+  const displayComment=editedComment!==null?editedComment:commentText;
+  g('rpt-comment').textContent=displayComment||'—';
+  g('rpt-comment-edit').value=displayComment||'';
+}
+
+function renderRptList(){
+  const th=LANG==='th';
+  let html='';
+  rptItems.forEach((item,idx)=>{
+    if(item.type==='section'){
+      html+=`<div class="sec-header">${item.sec}</div>`;
+      return;
+    }
+    const sel=selectedItems.has(idx);
+    const statusCls=sel?('selected-'+(item.s==='ok'?'ok':item.s==='warn'?'wn':'bd')):'';
+    const stLabel=item.s==='ok'?`<span class="ri-status-ok">✅ ${t('lbl-ok')}</span>`:
+                  item.s==='warn'?`<span class="ri-status-wn">⚠️ ${t('lbl-warn')}</span>`:
+                  `<span class="ri-status-bd">❌ ${t('lbl-fail')}</span>`;
+    const autoTag=item.auto?`<span class="ri-auto-tag">AUTO</span>`:'';
+    html+=`<div class="rpt-item ${sel?statusCls:''}" onclick="toggleItem(${idx})">
+      <div class="chk">${sel?'✓':''}</div>
+      <div class="ri-body">
+        <div class="ri-top">
+          <span class="ri-name">${item.lbl}${autoTag}</span>
+          <span class="ri-val">${item.vd}</span>
+        </div>
+        <div class="ri-row2">
+          <span class="ri-limit">${th?'เกณฑ์':'Limit'}: ${item.lim}</span>
+          ${stLabel}
+        </div>
+        ${item.cmt&&item.cmt!=='—'?`<div class="ri-comment">${item.cmt}</div>`:''}
+      </div>
+    </div>`;
+  });
+  g('rpt-table-wrap').innerHTML=html;
+}
+
+function toggleItem(idx){
+  if(selectedItems.has(idx)) selectedItems.delete(idx);
+  else selectedItems.add(idx);
+  renderRptList();
+}
+function checkAll(sel){
+  if(sel) rptItems.forEach((_,i)=>selectedItems.add(i));
+  else selectedItems.clear();
+  renderRptList();
+}
+
+// Editable comment
+function toggleEditComment(){
+  const p=g('rpt-comment'), ta=g('rpt-comment-edit'), btn=g('btn-edit-comment');
+  const th=LANG==='th';
+  if(ta.style.display==='none'){
+    ta.value=p.textContent; ta.style.display='block'; p.style.display='none';
+    btn.textContent=th?'💾 บันทึก':'💾 Save';
+  } else {
+    editedComment=ta.value; p.textContent=ta.value;
+    ta.style.display='none'; p.style.display='block';
+    btn.textContent=th?'✏️ แก้ไข':'✏️ Edit';
+  }
+}
+function saveEditedComment(){ editedComment=g('rpt-comment-edit').value; }
+
+// ══════════════════════════════════════════════════
+// Send channel
+// ══════════════════════════════════════════════════
+let sendChannel='line';
+function selectChannel(ch){
+  sendChannel=ch;
+  g('tab-line').className='send-tab'+(ch==='line'?' active-line':'');
+  g('tab-email').className='send-tab'+(ch==='email'?' active-email':'');
+  const ef=g('email-fields');
+  ef.classList.toggle('show',ch==='email');
+  updateSendBtn();
+}
+function updateSendBtn(){
+  const btn=g('btn-send-ch');
+  if(!btn) return;
+  if(sendChannel==='line'){
+    btn.className='btn btn-line'; btn.textContent=t('send-line');
+  } else {
+    btn.className='btn btn-email'; btn.textContent=t('send-email');
+  }
+}
+
+function buildReportText(){
+  const v=lastV; if(!v||!v.ph) return '';
+  const th=LANG==='th';
+  const sep='─'.repeat(28);
+  const ov=lastOv==='ok'?'✅ '+(th?'ผ่านมาตรฐาน':'All Pass'):lastOv==='warn'?'⚠️ '+(th?'ต้องติดตาม':'Warning'):'🚨 '+(th?'เกินมาตรฐาน':'Action Required');
+  const aiRes=v._aiRes||{};
+
+  // Build from selected items (or all if none selected)
+  const selected=rptItems.filter((_,i)=>selectedItems.has(i)&&rptItems[i].type==='item');
+  const useAll=selected.length===0;
+  const items=useAll?rptItems.filter(it=>it.type==='item'):selected;
+
+  let paramLines='';
+  let curSec='';
+  rptItems.forEach((it,idx)=>{
+    if(it.type==='section'){ if(selectedItems.has(idx)||useAll) curSec=it.sec; return; }
+    if(!selectedItems.has(idx)&&!useAll) return;
+    // Add section header on first item of section
+    if(curSec){ paramLines+='\n— '+curSec.toUpperCase()+' —\n'; curSec=''; }
+    const stat=it.s==='ok'?'✅':it.s==='warn'?'⚠️':'❌';
+    const lbl=(it.lbl+'                ').slice(0,20);
+    paramLines+=`${lbl} ${it.vd.padStart(12)}  ${stat}  (${it.lim})\n`;
+    if(it.cmt&&it.cmt!=='—'&&it.s!=='ok') paramLines+=`   → ${it.cmt}\n`;
+  });
+
+  const commentFinal=editedComment!==null?editedComment:(aiRes.act||'—');
+
+  return `${ov}
+📍 ${v.name} [${v.loc}]  |  ${v.ctid}
+🔧 CT Type: ${v.ctype} (${CT_ABR[v.ctype]})
+📅 ${v.date}
+SW: ${v.swid||t('lbl-no-sw-data')}
+${sep}
+${paramLines}${sep}
+💡 ${commentFinal}${v.note?'\n📝 '+v.note:''}
+
+[CT QA v16 • ASHRAE 188]`;
+}
+
+async function sendReport(){
+  if(!lastV||!lastV.ph){ alert(LANG==='th'?'กรุณาวิเคราะห์ข้อมูลก่อน':'Please analyze data first'); return; }
+  const msg=buildReportText();
+  if(sendChannel==='line'){
+    const token=g('cfg-lt').value||'', uid=g('cfg-uid').value||'';
+    if(!token||!uid){ alert(LANG==='th'?'กรุณาใส่ LINE Token และ User ID ใน Settings':'Please enter LINE Token and User ID in Settings'); return; }
+    g('lTxt').textContent=t('sending'); g('lOver').classList.add('on');
+    try{
+      const r=await fetch('https://api.line.me/v2/bot/message/push',{method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+        body:JSON.stringify({to:uid,messages:[{type:'text',text:msg}]})});
+      g('lOver').classList.remove('on');
+      if(r.ok) alert('✅ '+(LANG==='th'?'ส่งรายงานไปยัง LINE เรียบร้อย!':'Report sent to LINE successfully!'));
+      else{ const e=await r.json(); alert('❌ '+(e.message||r.status)); }
+    }catch(e){ g('lOver').classList.remove('on'); alert('❌ '+e.message); }
+  } else {
+    const to=gvs('email-to');
+    if(!to){ alert(LANG==='th'?'กรุณาใส่อีเมลปลายทาง':'Please enter recipient email'); return; }
+    const subj=gvs('email-subj')||`CT Report – ${lastV.date}`;
+    // Build mailto link
+    const body=encodeURIComponent(msg);
+    const mailto=`mailto:${to}?subject=${encodeURIComponent(subj)}&body=${body}`;
+    window.open(mailto,'_self');
+  }
+}
+
+// ══════════════════════════════════════════════════
+// Rule AI
+// ══════════════════════════════════════════════════
+function ruleAI(v,bads,warns,note,name,ctid,loc,date,ov){
+  const th=LANG==='th';
+  const cocTxt=v.coc!==null?`CoC ${v.coc.toFixed(2)}× (${v.cond}÷${v.swCond})`:(th?'ไม่มี SW':'No SW');
+  const lsiTxt=v.lsiMin!==null?(v.lsiMax>0.5?`LSI ${v.lsiStr} `+(th?'เสี่ยง Scale':'scaling risk'):v.lsiMin<-0.5?`LSI ${v.lsiStr} `+(th?'เสี่ยง Corrosion':'corrosion risk'):`LSI ${v.lsiStr} `+(th?'สมดุลดี':'balanced')):(th?'LSI ยังไม่ครบ':'LSI incomplete');
+  const badL=bads.map(k=>L[k]?.label||k).join(', ')||'—';
+  const sum=ov==='ok'
+    ?(th?`ค่าทุกพารามิเตอร์ของ ${name}[${loc}] ผ่านมาตรฐาน ASHRAE 188 — pH ${v.ph}, Cond ${v.cond}, ${cocTxt}`
+       :`All parameters of ${name}[${loc}] within ASHRAE 188 limits — pH ${v.ph}, Cond ${v.cond}, ${cocTxt}`)
+    :ov==='warn'
+    ?(th?`พบค่าต้องติดตาม — ควรดำเนินการภายใน 24 ชั่วโมง (${cocTxt})`:`Parameters need attention within 24 hours (${cocTxt})`)
+    :(th?`พบค่าเกิน: ${badL} — ดำเนินการทันที`:`Parameters exceed limits: ${badL} — immediate action required`);
+  const leg=(v.rescl<0.2||v.tbc>10000||(v.orp<300&&v.orp>0))
+    ?(th?`ความเสี่ยง Legionella สูง — Cl₂ ${v.rescl} ppm${v.rescl<0.2?' (ต่ำ)':''}, ORP ${v.orp}${v.orp<300&&v.orp>0?' (ต่ำ)':''}, TBC ${v.tbc.toLocaleString()}${v.tbc>10000?' (เกิน)':''}`
+         :`High Legionella risk — Cl₂ ${v.rescl} ppm${v.rescl<0.2?' (low)':''}, ORP ${v.orp}${v.orp<300&&v.orp>0?' (low)':''}, TBC ${v.tbc.toLocaleString()}${v.tbc>10000?' (exceeds)':''}`)
+    :(th?`ความเสี่ยง Legionella ต่ำ — Cl₂ ${v.rescl}, ORP ${v.orp}, TBC ${v.tbc.toLocaleString()} ปกติ`
+         :`Low Legionella risk — Cl₂ ${v.rescl}, ORP ${v.orp}, TBC ${v.tbc.toLocaleString()} within limits`);
+  const trend=`${lsiTxt} | ${cocTxt} | ${v.ctype}(${CT_ABR[v.ctype]}) RT:${v.rt!==null?v.rt.toFixed(1)+'ton':'—'} Evap:${v.evap!==null?v.evap.toFixed(2):'—'} BD:${v.blow!==null&&!isNaN(v.blow)?v.blow.toFixed(2):'—'} m³/hr`;
+  const act=ov==='ok'
+    ?(th?`ดำเนินการปกติ ตรวจสอบ Cl₂ และ TBC ตามรอบ`:`Continue normal operations, monitor Cl₂ and TBC per schedule`)
+    :ov==='warn'
+    ?(th?`ตรวจซ้ำใน 4 ชั่วโมง ปรับ Blowdown ถ้า Cond สูง แจ้งทีม Water Treatment`:`Re-check in 4 hours, adjust blowdown if conductivity remains high`)
+    :(th?`หยุด ${name} ทันที เก็บตัวอย่างซ้ำ รายงานผู้จัดการ ดำเนินการแก้ไขภายใน 1 ชั่วโมง`:`Stop ${name} immediately, resample, notify manager, corrective action within 1 hour`);
+  return {sum,leg,trend,act};
+}
+
+async function callClaude(apiKey,v,bads,warns,note,name,ctid,loc,date){
+  const th=LANG==='th';
+  const p=(th?`วิเคราะห์ Cooling Tower ตอบ JSON ไม่มี backtick (ภาษาไทย)`:`Analyze Cooling Tower, respond JSON only, no backtick (English)`)+
+    `\n${name}[${loc}] ${ctid} ${date} Type:${v.ctype}(${CT_ABR[v.ctype]})`+
+    `\nCoC:${v.coc!==null?v.coc.toFixed(2)+'×':'—'} | pH:${v.ph} | pHEst:${v.phEst!==null?v.phEst.toFixed(2):'—'}`+
+    `\nCond:${v.cond} | LSI:${v.lsiStr} | Cl₂:${v.rescl} ppm | ORP:${v.orp} | TBC:${v.tbc}`+
+    `\nRT:${v.rt!==null?v.rt.toFixed(1)+'ton':'—'} | Evap:${v.evap!==null?v.evap.toFixed(2):'—'} | BD:${v.blow!==null&&!isNaN(v.blow)?v.blow.toFixed(2):'—'}`+
+    `\n${th?'เกิน':'Exceeds'}:${bads.map(k=>L[k]?.label||k).join(',')||'—'} | ${th?'หมายเหตุ':'Note'}:${note||'—'}`+
+    `\n{"sum":"2 sentences","leg":"Legionella risk 2 sentences","trend":"CoC+LSI+System 2 sentences","act":"2-3 action items"}`;
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),15000); // 15s timeout
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
+      signal:controller.signal,
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:p}]})});
+    clearTimeout(timer);
+    const d=await r.json();
+    return JSON.parse(d.content[0].text.replace(/```json|```/g,'').trim());
+  }catch(e){
+    clearTimeout(timer);
+    throw e; // caller catches and falls back to ruleAI
+  }
+}
+
+// ══════════════════════════════════════════════════
+// History — Multi-select
+// ══════════════════════════════════════════════════
+let histSelected = new Set();
+
+function renderHist(){
+  const tb=g('sw-body'); const th=LANG==='th';
+  // SW table
+  tb.innerHTML=swLog.length?[...swLog].reverse().slice(0,20).map(r=>`
+    <tr><td class="id-c" onclick="pickSW('${r.sid}')">${r.sid}</td>
+    <td>${r.date}</td><td>${r.locCode}</td><td>${r.type}</td><td>${r.cond}</td>
+    <td><span class="badge b-${r.status==='PASS'?'ok':r.status==='WARN'?'wn':'bd'}" style="padding:2px 6px;font-size:9px">${r.status}</span></td></tr>`).join('')
+    :`<tr><td colspan="6" style="text-align:center;padding:14px;color:var(--muted)">${th?'ยังไม่มี SW':'No SW data'}</td></tr>`;
+
+  // CT log — multi-select items
+  const el=g('ct-hist');
+  if(!ctLog.length){ el.innerHTML=`<div class="empty">${t('l-no-ct')}</div>`; return; }
+
+  el.innerHTML=ctLog.slice(0,30).map((r,i)=>{
+    const sel=histSelected.has(i);
+    const ovCls=r.ov==='ok'?'ok':r.ov==='warn'?'wn':'bd';
+    const cocDisp=r.coc!==null?r.coc.toFixed(2)+'×':'—';
+    const lsiDisp=r.lsiStr||'—';
+    const condDisp=r.cond?r.cond+' µS/cm':'—';
+    const stBadge=`<span class="badge b-${ovCls}" style="padding:2px 7px;font-size:9px">${r.ov==='ok'?'PASS':r.ov==='warn'?'WARN':'FAIL'}</span>${r.pin?'<span class="pin-locked" style="margin-left:4px">🔒 PIN</span>':''}`; 
+    return `<div class="hist-item${sel?' sel':''}" onclick="toggleHistItem(${i})">
+      <div class="hi-chk">${sel?'✓':''}</div>
+      <div class="hi-body">
+        <div class="hi-row1">
+          <span class="hi-title">${r.name||'—'}</span>
+          ${stBadge}
+        </div>
+        <div class="hi-meta">${r.date} &nbsp;·&nbsp; ${r.loc||'—'} &nbsp;·&nbsp; ${r.ctype||'—'}(${CT_ABR[r.ctype]||'—'})</div>
+        <div class="hi-meta">${r.ctid||'—'}</div>
+        <div class="hi-kpis">
+          <span class="hi-kpi">Cond: ${condDisp}</span>
+          <span class="hi-kpi ${r.coc!==null?cocChk(r.coc):''}" >CoC: ${cocDisp}</span>
+          <span class="hi-kpi">LSI: ${lsiDisp}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function cocChk(c){ return c>8.0?'bd':c<2.0?'wn':'ok'; }
+
+function toggleHistItem(i){
+  if(histSelected.has(i)) histSelected.delete(i);
+  else histSelected.add(i);
+  renderHist();
+}
+function histSelAll(sel){
+  if(sel){ ctLog.slice(0,30).forEach((_,i)=>histSelected.add(i)); }
+  else histSelected.clear();
+  renderHist();
+}
+
+function histSendSelected(){
+  const th=LANG==='th';
+  const sel=[...histSelected].map(i=>ctLog[i]).filter(Boolean);
+  if(!sel.length){ alert(th?'กรุณาเลือกรายการก่อน':'Please select items first'); return; }
+  const token=g('cfg-lt').value||'', uid=g('cfg-uid').value||'';
+  if(!token||!uid){ alert(th?'กรุณาใส่ LINE Token และ User ID ใน Settings':'Please enter LINE Token and User ID in Settings'); return; }
+  const sep='─'.repeat(26);
+  const msgs=sel.map(r=>{
+    const ov=r.ov==='ok'?'✅ PASS':r.ov==='warn'?'⚠️ WARN':'🚨 FAIL';
+    return `${ov} ${r.name||'—'} [${r.loc||'—'}]\n`+
+      `${r.date} | ${r.ctype||'—'}(${CT_ABR[r.ctype]||'—'})\n`+
+      `Cond: ${r.cond||'—'} µS/cm | CoC: ${r.coc!==null?r.coc.toFixed(2)+'×':'—'} | LSI: ${r.lsiStr||'—'}\n`+
+      `Cl₂: ${r.rescl||'—'} ppm | TBC: ${r.tbc!==undefined?r.tbc.toLocaleString():'—'}\n`+
+      (r.note?`📝 ${r.note}`:'')+`\n${sep}`;
+  });
+  const fullMsg=`📋 CT Report Summary (${sel.length} records)\n${sep}\n`+msgs.join('\n');
+  g('lTxt').textContent=t('sending'); g('lOver').classList.add('on');
+  fetch('https://api.line.me/v2/bot/message/push',{method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+    body:JSON.stringify({to:uid,messages:[{type:'text',text:fullMsg}]})
+  }).then(r=>{
+    g('lOver').classList.remove('on');
+    if(r.ok) alert('✅ '+sel.length+' '+( th?'รายการส่งแล้ว':'records sent successfully!'));
+    else r.json().then(e=>alert('❌ '+(e.message||r.status)));
+  }).catch(e=>{ g('lOver').classList.remove('on'); alert('❌ '+e.message); });
+}
+
+function histEditSelected(){
+  const th=LANG==='th';
+  const sel=[...histSelected];
+  if(!sel.length){ alert(th?'กรุณาเลือกรายการก่อน':'Please select items first'); return; }
+  if(sel.length>1){ alert(th?'เลือกได้ครั้งละ 1 รายการสำหรับแก้ไข':'Select 1 item at a time to edit'); return; }
+  const r=ctLog[sel[0]];
+  if(!r) return;
+  // Load into CT Entry form
+  if(g('ct-date')) g('ct-date').value=r.date||'';;
+  if(g('ct-type')&&r.ctype){ g('ct-type').value=r.ctype; onCTType(); }
+  if(g('ct-name')) g('ct-name').value=r.name||'Cooling Tower A';
+  if(g('ct-ph'))   g('ct-ph').value=r.ph||7.8;
+  if(g('ct-cond')) g('ct-cond').value=r.cond||0;
+  if(g('ct-note')) g('ct-note').value=r.note||'';
+  refreshCT();
+  setTimeout(()=>{
+    if(r.loc&&g('ct-loc')){ g('ct-loc').value=r.loc; refreshCT(); }
+    if(r.swid&&g('ct-swid')){ g('ct-swid').value=r.swid; onSWIDSel(); }
+    calcCTAuto(); calcSysAuto();
+  },200);
+  sw_nav('ct');
+  alert(th?`โหลดข้อมูล ${r.date} - ${r.name} แล้ว กรุณาตรวจสอบและแก้ไข`:
+           `Loaded ${r.date} - ${r.name}. Please review and edit.`);
+}
+
+function pickSW(sid){ sw_nav('ct'); g('ct-swid').value=sid; onSWIDSel(); }
+
+// ══════════════════════════════════════════════════
+// Config
+// ══════════════════════════════════════════════════
+function saveCfg(){ localStorage.setItem('ct_cfg16',JSON.stringify({ant:g('cfg-ant').value,lt:g('cfg-lt').value,uid:g('cfg-uid').value})); }
+function loadCfg(){ const c=JSON.parse(localStorage.getItem('ct_cfg16')||'{}'); if(c.ant)g('cfg-ant').value=c.ant; if(c.lt)g('cfg-lt').value=c.lt; if(c.uid)g('cfg-uid').value=c.uid; }
+function clearAll(){ if(!confirm(LANG==='th'?'ล้างข้อมูลทั้งหมด?':'Clear all data?'))return; swLog=[];ctLog=[]; localStorage.removeItem('sw_log16');localStorage.removeItem('ct_log16'); alert(LANG==='th'?'ล้างแล้ว':'Cleared'); }
+
+// ══════════════════════════════════════════════════
+// Init
+// ══════════════════════════════════════════════════
+const today=new Date().toISOString().split('T')[0];
+g('sw-date').value=today; g('ct-date').value=today;
+loadCfg(); calcSWAuto(); calcCTAuto(); calcSysAuto();
+onSwType(); refreshCT(); updateCTID();
+applyLang();
+g('email-subj').value=`Cooling Tower Water Quality Report – ${today}`;
+
+// ── Signature Canvas ──
+(function initSig(){
+  const canvas=g('sig1-canvas');
+  if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+  let drawing=false, lastX=0, lastY=0;
+  function getPos(e){
+    const r=canvas.getBoundingClientRect();
+    const src=e.touches?e.touches[0]:e;
+    return [(src.clientX-r.left)*(canvas.width/r.width),(src.clientY-r.top)*(canvas.height/r.height)];
+  }
+  function start(e){ e.preventDefault(); drawing=true; [lastX,lastY]=getPos(e); }
+  function draw(e){ e.preventDefault(); if(!drawing)return; const [x,y]=getPos(e);
+    ctx.beginPath(); ctx.moveTo(lastX,lastY); ctx.lineTo(x,y);
+    ctx.strokeStyle='#1A1A2E'; ctx.lineWidth=2; ctx.lineCap='round'; ctx.stroke();
+    [lastX,lastY]=[x,y]; }
+  function stop(){ drawing=false; }
+  canvas.addEventListener('mousedown',start); canvas.addEventListener('mousemove',draw);
+  canvas.addEventListener('mouseup',stop); canvas.addEventListener('mouseleave',stop);
+  canvas.addEventListener('touchstart',start,{passive:false});
+  canvas.addEventListener('touchmove',draw,{passive:false});
+  canvas.addEventListener('touchend',stop);
+})();
+
+function clearSig(){
+  const canvas=g('sig1-canvas'); if(!canvas)return;
+  canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
+}
+function saveSigName(){
+  const th=LANG==='th';
+  const name=gvs('sig1-name'), pos=gvs('sig1-pos');
+  alert(th?`บันทึกแล้ว: ${name||'—'} (${pos||'—'})`:
+            `Saved: ${name||'—'} (${pos||'—'})`);
+}
+
+// ══════════════════════════════════════════════════
+// Image Upload (Report)
+// ══════════════════════════════════════════════════
+let reportImages = []; // base64 strings
+
+function handleImgUpload(e){
+  const files=[...e.target.files];
+  if(!files.length) return;
+  files.forEach(file=>{
+    if(!file.type.startsWith('image/')) return;
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      reportImages.push({src:ev.target.result, name:file.name});
+      renderImgPreviews();
+    };
+    reader.readAsDataURL(file);
+  });
+  e.target.value=''; // allow re-selecting same file
+}
+
+function renderImgPreviews(){
+  const wrap=g('img-preview-wrap'); if(!wrap) return;
+  const hint=g('img-empty-hint');
+  if(reportImages.length===0){
+    if(hint) hint.style.display='block'; return;
+  }
+  if(hint) hint.style.display='none';
+  wrap.innerHTML=reportImages.map((img,i)=>`
+    <div class="img-thumb-wrap">
+      <img src="${img.src}" alt="${img.name}" onclick="viewImg(${i})">
+      <button class="img-thumb-del" onclick="removeImg(${i})">×</button>
+    </div>`).join('')+
+    `<label for="img-upload" style="width:80px;height:80px;border-radius:var(--rs);border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);font-size:22px">+</label>`;
+}
+
+function removeImg(i){
+  reportImages.splice(i,1); renderImgPreviews();
+}
+function viewImg(i){
+  const img=reportImages[i]; if(!img) return;
+  // open in new tab
+  const w=window.open('about:blank');
+  w.document.write(`<img src="${img.src}" style="max-width:100%;max-height:100vh">`);
+}
+
+// ══════════════════════════════════════════════════
+// PIN Lock (Report)
+// ══════════════════════════════════════════════════
+function togglePin(){
+  const en=g('pin-enable').checked;
+  const fields=g('pin-fields');
+  if(fields) fields.style.display=en?'block':'none';
+  if(!en){ const pi=g('pin-input'); if(pi) pi.value=''; }
+}
+
+function getReportPin(){
+  if(!g('pin-enable')||!g('pin-enable').checked) return null;
+  const v=(g('pin-input')||{}).value||'';
+  if(v.length===4&&/^[0-9]{4}$/.test(v)) return v;
+  return null;
+}
+
+// Override sendReport to embed PIN in saved log
+const _origSendReport=sendReport;
+
+// ══════════════════════════════════════════════════
+// History: Delete + Send (LINE+Email) + PIN verify
+// ══════════════════════════════════════════════════
+let pendingHistAction=null; // {action: 'line'|'email', items:[]}
+
+function histDeleteSelected(){
+  const th=LANG==='th';
+  const sel=[...histSelected];
+  if(!sel.length){ alert(th?'กรุณาเลือกรายการก่อน':'Please select items first'); return; }
+  const locked=sel.filter(i=>ctLog[i]&&ctLog[i].pin);
+  if(locked.length){
+    alert(th?`มี ${locked.length} รายการที่เข้ารหัส กรุณากรอก PIN ก่อนลบ`:
+              `${locked.length} locked record(s). Please unlock PIN before deleting.`);
+    showHistPinPrompt({action:'delete',items:sel}); return;
+  }
+  const msg=th?`ลบ ${sel.length} รายการ? ไม่สามารถกู้คืนได้`:
+                `Delete ${sel.length} record(s)? This cannot be undone.`;
+  if(!confirm(msg)) return;
+  // Remove in reverse order to preserve indices
+  [...sel].sort((a,b)=>b-a).forEach(i=>ctLog.splice(i,1));
+  histSelected.clear();
+  localStorage.setItem('ct_log16',JSON.stringify(ctLog));
+  renderHist();
+  alert(th?'ลบเรียบร้อยแล้ว':'Deleted successfully.');
+}
+
+function histSendSelected(channel){
+  const th=LANG==='th';
+  const sel=[...histSelected].map(i=>ctLog[i]).filter(Boolean);
+  if(!sel.length){ alert(th?'กรุณาเลือกรายการก่อน':'Please select items first'); return; }
+  const locked=sel.filter(r=>r.pin);
+  if(locked.length){
+    pendingHistAction={action:channel, items:[...histSelected]};
+    showHistPinPrompt({action:channel, items:[...histSelected]}); return;
+  }
+  doHistSend(channel, sel);
+}
+
+function showHistPinPrompt(ctx){
+  pendingHistAction=ctx;
+  const el=g('hist-pin-prompt'); if(el) el.style.display='block';
+  const inp=g('hist-pin-input'); if(inp){ inp.value=''; inp.focus(); }
+}
+function verifyHistPin(){
+  const th=LANG==='th';
+  const entered=(g('hist-pin-input')||{}).value||'';
+  if(!pendingHistAction){ hideHistPin(); return; }
+  const sel=pendingHistAction.items||[];
+  const items=sel.map(i=>ctLog[i]).filter(Boolean);
+  // Check PIN for locked items
+  const allMatch=items.filter(r=>r.pin).every(r=>r.pin===entered);
+  if(!allMatch){
+    alert(th?'รหัสไม่ถูกต้อง':'Incorrect PIN.');
+    const inp=g('hist-pin-input'); if(inp){inp.value='';inp.focus();}
+    return;
+  }
+  hideHistPin();
+  if(pendingHistAction.action==='delete'){
+    const msg=th?`ลบ ${sel.length} รายการ?`:`Delete ${sel.length} record(s)?`;
+    if(!confirm(msg)) return;
+    [...sel].sort((a,b)=>b-a).forEach(i=>ctLog.splice(i,1));
+    histSelected.clear();
+    localStorage.setItem('ct_log16',JSON.stringify(ctLog));
+    renderHist();
+    alert(th?'ลบเรียบร้อย':'Deleted.');
+  } else {
+    doHistSend(pendingHistAction.action, items);
+  }
+  pendingHistAction=null;
+}
+function hideHistPin(){
+  const el=g('hist-pin-prompt'); if(el) el.style.display='none';
+}
+
+function doHistSend(channel, sel){
+  const th=LANG==='th';
+  const sep='─'.repeat(26);
+  const msgs=sel.map(r=>{
+    const ov=r.ov==='ok'?'✅ PASS':r.ov==='warn'?'⚠️ WARN':'🚨 FAIL';
+    return `${ov} ${r.name||'—'} [${r.loc||'—'}]\n`+
+      `${r.date} | ${r.ctype||'—'}(${CT_ABR[r.ctype]||'—'})\n`+
+      `Cond: ${r.cond||'—'} µS/cm | CoC: ${r.coc!==null?r.coc.toFixed(2)+'×':'—'} | LSI: ${r.lsiStr||'—'}\n`+
+      `Cl₂: ${r.rescl!==undefined?r.rescl:'—'} ppm | TBC: ${r.tbc!==undefined?r.tbc.toLocaleString():'—'}\n`+
+      (r.note?`📝 ${r.note}`:'')+`\n${sep}`;
+  });
+  const fullMsg=`📋 CT Report Summary (${sel.length} records)\n${sep}\n`+msgs.join('\n');
+
+  if(channel==='line'){
+    const token=g('cfg-lt').value||'', uid=g('cfg-uid').value||'';
+    if(!token||!uid){ alert(th?'กรุณาใส่ LINE Token และ User ID ใน Settings':'Please enter LINE Token and User ID in Settings'); return; }
+    g('lTxt').textContent=t('sending'); g('lOver').classList.add('on');
+    fetch('https://api.line.me/v2/bot/message/push',{method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body:JSON.stringify({to:uid,messages:[{type:'text',text:fullMsg}]})
+    }).then(r=>{
+      g('lOver').classList.remove('on');
+      if(r.ok) alert('✅ '+sel.length+' '+( th?'รายการส่งแล้ว':'records sent!'));
+      else r.json().then(e=>alert('❌ '+(e.message||r.status)));
+    }).catch(e=>{ g('lOver').classList.remove('on'); alert('❌ '+e.message); });
+  } else {
+    // Email via mailto
+    const to=gvs('email-to')||prompt(th?'กรอกอีเมลปลายทาง:':'Enter recipient email:','')||'';
+    if(!to) return;
+    const subj=encodeURIComponent(th?`CT Report Summary – ${new Date().toLocaleDateString('th-TH')}`:
+                                       `CT Report Summary – ${new Date().toLocaleDateString()}`);
+    window.open(`mailto:${to}?subject=${subj}&body=${encodeURIComponent(fullMsg)}`,'_self');
+  }
+}
+
+// ══════════════════════════════════════════════════
+// SAVE REPORT & PREVIEW  (v16)
+// ══════════════════════════════════════════════════
+let savedReports16 = JSON.parse(localStorage.getItem('ct_reports16')||'[]');
+
+function saveReport(){
+  // Ensure buildReport has run (rptItems populated)
+  buildReport();
+  const v = lastV;
+  if(!v||!v.ph){
+    alert(LANG==='th'?'กรุณาวิเคราะห์ข้อมูลก่อน':'Please analyze data first');
+    return;
+  }
+  // Capture signature
+  let sig1Img = null;
+  try{ const c=g('sig1-canvas'); if(c) sig1Img=c.toDataURL('image/png'); }catch(e){}
+
+  const rec = {
+    id: Date.now(),
+    date: v.date||'—',
+    loc: v.loc||'—',
+    name: v.name||'—',
+    ctype: v.ctype||'—',
+    ctid: v.ctid||'—',
+    swid: v.swid||'—',
+    ph: v.ph, cond: v.cond, coc: v.coc,
+    lsiStr: v.lsiStr||'—',
+    lsiMin: v.lsiMin, lsiMax: v.lsiMax,
+    ov: lastOv,
+    paramSnap: rptItems.filter((_,i)=>selectedItems.has(i)).map(it=>({...it})),
+    recommendation: editedComment !== null ? editedComment :
+      (v._aiRes ? (v._aiRes.sum||'')+(v._aiRes.act?'\n\nคำแนะนำ: '+v._aiRes.act:'') : ''),
+    images: [...reportImages],
+    sig1Name: gvs('sig1-name'), sig1Pos: gvs('sig1-pos'), sig1Img,
+    sig2Name: gvs('sig2-name'), sig2Pos: gvs('sig2-pos'),
+    pin: getReportPin(),
+    savedAt: new Date().toISOString(),
+  };
+
+  savedReports16.unshift(rec);
+  if(savedReports16.length > 50) savedReports16.pop();
+  try{
+    localStorage.setItem('ct_reports16', JSON.stringify(savedReports16));
+  }catch(e){
+    // Storage full — save without images
+    const slim = savedReports16.map(r=>({...r,images:[],sig1Img:null}));
+    localStorage.setItem('ct_reports16', JSON.stringify(slim));
+  }
+
+  // Show preview button
+  const aw = g('after-save-wrap');
+  if(aw) aw.style.display = 'block';
+}
+
+function previewSavedReport(){
+  if(!savedReports16.length){ alert('ยังไม่มีรายงานที่บันทึก'); return; }
+  showReportPreview(savedReports16[0]);
+}
+
+// ── Simple preview modal ──
+function showReportPreview(rec){
+  if(!rec) return;
+  const th = LANG==='th';
+  const ov = rec.ov||'ok';
+  const ovColor = ov==='ok'?'#1E8449':ov==='warn'?'#B7770D':'#A93226';
+  const ovTxt   = ov==='ok'?'✅ PASS':ov==='warn'?'⚠️ WARNING':'🚨 FAIL';
+
+  // Build param rows from selected items
+  const params = (rec.paramSnap||[]).filter(it=>it.type==='item');
+  const secs = {};
+  let curSec = 'Parameters';
+  (rec.paramSnap||[]).forEach(it=>{
+    if(it.type==='section'){ curSec=it.sec; return; }
+    if(!secs[curSec]) secs[curSec]=[];
+    secs[curSec].push(it);
+  });
+
+  let paramHtml = '';
+  Object.entries(secs).forEach(([sec,items])=>{
+    if(!items.length) return;
+    paramHtml+=`<tr style="background:#F0F4F8"><td colspan="4" style="padding:6px 10px;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em">${sec}</td></tr>`;
+    items.forEach(it=>{
+      const sc=it.s==='ok'?'✅':it.s==='warn'?'⚠️':'❌';
+      const auto=it.auto?'<span style="font-size:8px;background:#F3E5F5;color:#4A235A;padding:1px 4px;border-radius:8px;margin-left:3px">AUTO</span>':'';
+      paramHtml+=`<tr style="border-bottom:1px solid #F0F4F8">
+        <td style="padding:7px 10px;font-size:11px;font-weight:600">${it.lbl}${auto}</td>
+        <td style="padding:7px 10px;font-size:12px;font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:700;color:${it.s==='ok'?'#1E8449':it.s==='warn'?'#B7770D':'#A93226'}">${it.vd}</td>
+        <td style="padding:7px 10px;font-size:10px;color:var(--muted);text-align:center">${it.lim}</td>
+        <td style="padding:7px 10px;text-align:center;font-size:14px">${sc}</td>
+      </tr>`;
+      if(it.cmt&&it.cmt!=='—'&&it.s!=='ok'){
+        paramHtml+=`<tr><td colspan="4" style="padding:3px 10px 7px;font-size:10px;color:var(--muted);font-style:italic">${it.cmt}</td></tr>`;
+      }
+    });
+  });
+
+  const imgHtml = (rec.images||[]).length
+    ? `<div style="padding:12px 16px;border-top:1px solid var(--border)">
+        <div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:8px">รูปภาพอ้างอิง</div>
+        <div style="display:flex;flex-wrap:wrap;gap:7px">
+          ${(rec.images||[]).map(img=>`<img src="${img.src}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid var(--border)">`).join('')}
+        </div></div>` : '';
+
+  const savedDt = rec.savedAt ? new Date(rec.savedAt).toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'}) : rec.date;
+
+  const modal = document.createElement('div');
+  modal.id = 'preview-modal-v16';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.6);overflow-y:auto;-webkit-overflow-scrolling:touch';
+  modal.innerHTML = `
+  <div style="min-height:100vh;padding:12px;display:flex;flex-direction:column;align-items:center">
+    <!-- Sticky toolbar -->
+    <div style="position:sticky;top:8px;z-index:201;background:rgba(10,61,98,.97);border-radius:14px;padding:10px 14px;width:100%;max-width:600px;display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;box-shadow:0 4px 20px rgba(0,0,0,.35)">
+      <span style="color:#fff;font-size:13px;font-weight:600">📄 รายงาน 1 แผ่น</span>
+      <div style="display:flex;gap:7px">
+        <button onclick="sendSavedRec(this.closest('#preview-modal-v16')._rec,'line')" style="padding:7px 12px;border-radius:20px;border:none;background:var(--line);color:#fff;font-size:11px;font-weight:600;font-family:inherit;cursor:pointer">💬 LINE</button>
+        <button onclick="sendSavedRec(this.closest('#preview-modal-v16')._rec,'email')" style="padding:7px 12px;border-radius:20px;border:none;background:var(--email);color:#fff;font-size:11px;font-weight:600;font-family:inherit;cursor:pointer">✉️ Email</button>
+        <button onclick="this.closest('#preview-modal-v16').remove()" style="padding:7px 10px;border-radius:20px;border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;font-size:11px;font-family:inherit;cursor:pointer">✕</button>
+      </div>
+    </div>
+    <!-- Report card -->
+    <div style="background:#fff;width:100%;max-width:600px;border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,.2);overflow:hidden;margin-bottom:20px">
+      <!-- Header -->
+      <div style="background:linear-gradient(135deg,#0A3D62,#1A5276);padding:18px 20px">
+        <div style="font-size:9px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px">WATER QUALITY REPORT</div>
+        <div style="font-size:17px;font-weight:700;color:#fff">${rec.name} <span style="font-size:12px;opacity:.7">[${rec.loc}]</span></div>
+        <div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:3px">${rec.ctid} &nbsp;|&nbsp; ${rec.ctype} &nbsp;|&nbsp; ${rec.date}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px">
+          <div style="background:rgba(255,255,255,.12);border-radius:8px;padding:8px;text-align:center">
+            <div style="font-size:9px;color:rgba(255,255,255,.6)">Conductivity</div>
+            <div style="font-size:16px;font-weight:700;color:#fff;font-family:'IBM Plex Mono',monospace">${rec.cond}</div>
+            <div style="font-size:9px;color:rgba(255,255,255,.5)">µS/cm</div>
+          </div>
+          <div style="background:rgba(255,255,255,.12);border-radius:8px;padding:8px;text-align:center">
+            <div style="font-size:9px;color:rgba(255,255,255,.6)">CoC</div>
+            <div style="font-size:16px;font-weight:700;color:#fff;font-family:'IBM Plex Mono',monospace">${rec.coc!==null?rec.coc.toFixed(2)+'×':'—'}</div>
+          </div>
+          <div style="background:rgba(255,255,255,.12);border-radius:8px;padding:8px;text-align:center">
+            <div style="font-size:9px;color:rgba(255,255,255,.6)">LSI</div>
+            <div style="font-size:13px;font-weight:700;color:#fff;font-family:'IBM Plex Mono',monospace">${rec.lsiStr}</div>
+          </div>
+        </div>
+      </div>
+      <!-- Status -->
+      <div style="padding:12px 16px;background:${ov==='ok'?'#D5F5E3':ov==='warn'?'#FEF9E7':'#FADBD8'};border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px">
+        <span style="font-size:22px">${ov==='ok'?'✅':ov==='warn'?'⚠️':'🚨'}</span>
+        <span style="font-size:14px;font-weight:700;color:${ovColor}">${ovTxt}</span>
+      </div>
+      <!-- Params table -->
+      <table style="width:100%;border-collapse:collapse">
+        <thead><tr style="background:#F0F4F8">
+          <th style="padding:7px 10px;text-align:left;font-size:10px;color:var(--muted);font-weight:600">พารามิเตอร์</th>
+          <th style="padding:7px 10px;text-align:right;font-size:10px;color:var(--muted);font-weight:600">ค่าที่วัด</th>
+          <th style="padding:7px 10px;text-align:center;font-size:10px;color:var(--muted);font-weight:600">เกณฑ์</th>
+          <th style="padding:7px 10px;text-align:center;font-size:10px;color:var(--muted);font-weight:600">สถานะ</th>
+        </tr></thead>
+        <tbody>${paramHtml}</tbody>
+      </table>
+      ${imgHtml}
+      <!-- Recommendation -->
+      <div style="padding:12px 16px;border-top:1px solid var(--border)">
+        <div style="font-size:9px;font-weight:700;color:var(--acc);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">ข้อเสนอแนะ</div>
+        <div style="font-size:12px;line-height:1.8;color:var(--text);white-space:pre-wrap">${rec.recommendation||'—'}</div>
+      </div>
+      <!-- Signatures -->
+      <div style="padding:12px 16px;border-top:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div style="border:1px solid var(--border);border-radius:10px;padding:10px">
+          <div style="font-size:9px;color:var(--muted);margin-bottom:6px">ผู้ตรวจสอบ</div>
+          ${rec.sig1Img?`<img src="${rec.sig1Img}" style="width:100%;height:45px;object-fit:contain;object-position:left;margin-bottom:4px">`:
+            '<div style="height:45px;border-bottom:1px dashed var(--border);margin-bottom:4px"></div>'}
+          <div style="font-size:11px;font-weight:600">${rec.sig1Name||'________________________'}</div>
+          <div style="font-size:10px;color:var(--muted)">${rec.sig1Pos||''}</div>
+        </div>
+        <div style="border:1px solid var(--border);border-radius:10px;padding:10px">
+          <div style="font-size:9px;color:var(--muted);margin-bottom:6px">ผู้รับบริการ</div>
+          <div style="height:45px;border-bottom:1px dashed var(--border);margin-bottom:4px"></div>
+          <div style="font-size:11px;font-weight:600">${rec.sig2Name||'________________________'}</div>
+          <div style="font-size:10px;color:var(--muted)">${rec.sig2Pos||''}</div>
+        </div>
+      </div>
+      <!-- Footer -->
+      <div style="background:#F0F4F8;padding:8px 16px;display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:9px;color:var(--muted)">CT QA v16 • ASHRAE 188</div>
+        <div style="font-size:9px;color:var(--muted)">💾 ${savedDt}</div>
+      </div>
+    </div>
+  </div>`;
+  modal._rec = rec;
+  document.body.appendChild(modal);
+}
+
+function sendSavedRec(rec, channel){
+  if(!rec) return;
+  const sep='─'.repeat(26);
+  const params = (rec.paramSnap||[]).filter(it=>it.type==='item');
+  let pLines = params.map(it=>{
+    const sc=it.s==='ok'?'✅':it.s==='warn'?'⚠️':'❌';
+    return `${(it.lbl+'                ').slice(0,18)} ${it.vd.padStart(10)}  ${sc}`;
+  }).join('\n');
+  const msg=`${rec.ov==='ok'?'✅':rec.ov==='warn'?'⚠️':'🚨'} Water Quality Report
+📍 ${rec.name} [${rec.loc}]  |  ${rec.ctid}
+📅 ${rec.date}  |  ${rec.ctype}
+${sep}
+${pLines}
+${sep}
+CoC: ${rec.coc!==null?rec.coc.toFixed(2)+'×':'—'}  |  LSI: ${rec.lsiStr}
+💡 ${rec.recommendation||'—'}
+
+[CT QA v16 • ASHRAE 188]`;
+
+  if(channel==='line'){
+    const token=g('cfg-lt').value||'', uid=g('cfg-uid').value||'';
+    if(!token||!uid){ alert('กรุณาใส่ LINE Token และ User ID ใน Settings'); return; }
+    g('lTxt').textContent='กำลังส่ง...'; g('lOver').classList.add('on');
+    fetch('https://api.line.me/v2/bot/message/push',{method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body:JSON.stringify({to:uid,messages:[{type:'text',text:msg}]})
+    }).then(r=>{ g('lOver').classList.remove('on'); if(r.ok) alert('✅ ส่งแล้ว!'); else r.json().then(e=>alert('❌ '+(e.message||r.status))); })
+    .catch(e=>{ g('lOver').classList.remove('on'); alert('❌ '+e.message); });
+  } else {
+    const to=gvs('email-to')||prompt('กรอกอีเมล:','')||'';
+    if(!to) return;
+    window.open('mailto:'+to+'?subject='+encodeURIComponent('CT Report – '+rec.date+'  '+rec.name)+'&body='+encodeURIComponent(msg),'_self');
+  }
+}
+
+</script>
+</body>
+</html>
