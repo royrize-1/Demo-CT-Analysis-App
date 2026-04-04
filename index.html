@@ -266,7 +266,9 @@ body{font-family:'IBM Plex Sans Thai',sans-serif;background:var(--bg);color:var(
   <div class="card">
     <div class="g3">
       <div class="f"><label>Temp<span class="lim">°C 15–30</span></label><input type="number" id="sw-tmp" step="0.1" value="28.5"></div>
-      <div class="f"><label>pH<span class="lim">6.5–7.5</span></label><input type="number" id="sw-ph" step="0.1" value="7.0"></div>
+      <div class="f"><label>pH<span class="lim">0–14</span></label>
+        <input type="number" id="sw-ph" step="0.1" min="0" max="14" value="7.0" onblur="clampPH('sw-ph')">
+      </div>
       <div class="f"><label id="l-cond-sw">Conductivity<span class="lim" id="sw-cond-lim">&lt;1000</span></label>
         <input type="number" id="sw-cond" value="420" oninput="calcSWAuto()"></div>
     </div>
@@ -276,7 +278,7 @@ body{font-family:'IBM Plex Sans Thai',sans-serif;background:var(--bg);color:var(
     </div>
   </div>
 
-  <div class="slbl" id="l-sw-chem">Chemistry</div>
+  <div class="slbl" id="l-sw-chem">Chemistry & Ions</div>
   <div class="card">
     <div class="g2">
       <div class="f"><label id="l-th-sw">Total Hardness<span class="lim" id="sw-th-lim">&lt;150 mg/L</span></label><input type="number" id="sw-th" value="85" oninput="calcSWAuto()"></div>
@@ -285,6 +287,12 @@ body{font-family:'IBM Plex Sans Thai',sans-serif;background:var(--bg);color:var(
     <div class="g2" style="margin-top:9px">
       <div class="f"><label>M-Alkalinity<span class="lim" id="sw-alk-lim">&lt;300 mg/L</span></label><input type="number" id="sw-alk" value="180"></div>
       <div class="f"><label>Total Iron<span class="lim">&lt;1.0 mg/L</span></label><input type="number" id="sw-fe" step="0.01" value="0.4"></div>
+    </div>
+    <div class="g2" style="margin-top:9px">
+      <div class="f"><label>Chloride<span class="lim">&lt;100 ppm</span></label><input type="number" id="sw-cl" step="0.1" placeholder="ppm"></div>
+      <div class="f"><label>Silica<span class="lim">&lt;100 ppm</span></label>
+        <input type="number" id="sw-sio2" step="0.1" min="0" max="100" placeholder="ไม่ได้วิเคราะห์">
+      </div>
     </div>
   </div>
   <button class="btn btn-p" id="btn-save-sw" onclick="saveSW()">บันทึก Supply Water →</button>
@@ -330,7 +338,9 @@ body{font-family:'IBM Plex Sans Thai',sans-serif;background:var(--bg);color:var(
   <div class="card">
     <div class="g3">
       <div class="f"><label>Temp<span class="lim">25–35°C</span></label><input type="number" id="ct-tmp" step="0.1" value="32.0" oninput="calcCTAuto()"></div>
-      <div class="f"><label>pH<span class="lim">7.0–8.5</span></label><input type="number" id="ct-ph" step="0.1" value="7.8" oninput="calcCTAuto()"></div>
+      <div class="f"><label>pH<span class="lim">0–14</span></label>
+        <input type="number" id="ct-ph" step="0.1" min="0" max="14" value="7.8" oninput="calcCTAuto()" onblur="clampPH('ct-ph')">
+      </div>
       <div class="f"><label>Conductivity<span class="lim">1000–2500</span></label><input type="number" id="ct-cond" value="1850" oninput="calcCTAuto();updateCoCLive()"></div>
     </div>
     <div class="g2" style="margin-top:9px">
@@ -339,7 +349,7 @@ body{font-family:'IBM Plex Sans Thai',sans-serif;background:var(--bg);color:var(
     </div>
   </div>
 
-  <div class="slbl" id="l-ct-chem">Chemistry</div>
+  <div class="slbl" id="l-ct-chem">Chemistry & Ions</div>
   <div class="card">
     <div class="g2">
       <div class="f"><label>Total Hardness<span class="lim">&lt;500</span></label><input type="number" id="ct-th" value="450" oninput="calcCTAuto()"></div>
@@ -350,20 +360,21 @@ body{font-family:'IBM Plex Sans Thai',sans-serif;background:var(--bg);color:var(
       <div class="f"><label>pH Est.<span class="ac">AUTO</span></label><input type="text" id="ct-phest" class="af" readonly></div>
     </div>
     <div class="f" style="margin-top:9px"><label>Total Iron<span class="lim">mg/L (0.01)</span></label><input type="number" id="ct-fe" step="0.01" value="0.01"></div>
+    <div class="g2" style="margin-top:9px">
+      <div class="f"><label>Chloride<span class="lim">&lt;300 mg/L</span></label><input type="number" id="ct-cl" value="185"></div>
+      <div class="f"><label>Sulfate<span class="lim">&lt;250/500 ppm</span></label>
+        <input type="number" id="ct-so4" step="0.1" min="0" placeholder="ไม่ได้วิเคราะห์">
+      </div>
+    </div>
+    <div class="f" style="margin-top:9px">
+      <label>Silica<span class="lim">&lt;150 mg/L</span></label>
+      <input type="number" id="ct-sio2" step="0.1" min="0" placeholder="ไม่ได้วิเคราะห์">
+    </div>
   </div>
   <div id="lsi-panel" class="lsi-box">
     <div class="lsi-t">LSI Range (Langelier)<span class="ac" style="background:#E3F2FD;color:#1565C0;border-color:#90CAF9">AUTO</span></div>
     <div class="lsi-r"><div class="lsi-v" id="lsi-mn">—</div><div style="font-size:14px;color:#1565C0;opacity:.5">–</div><div class="lsi-v" id="lsi-mx">—</div></div>
     <div class="lsi-n" id="lsi-note">ข้อมูลยังไม่ครบ</div>
-  </div>
-
-  <div class="slbl" id="l-ct-scale">Scale & Ions</div>
-  <div class="card">
-    <div class="g3">
-      <div class="f"><label>Chloride<span class="lim">&lt;300</span></label><input type="number" id="ct-cl" value="185"></div>
-      <div class="f"><label>Sulfate<span class="lim">&lt;500</span></label><input type="number" id="ct-so4" value="210"></div>
-      <div class="f"><label>Silica<span class="lim">&lt;150</span></label><input type="number" id="ct-sio2" value="62"></div>
-    </div>
   </div>
 
   <div class="slbl" id="l-ct-bio">Biological</div>
@@ -372,7 +383,7 @@ body{font-family:'IBM Plex Sans Thai',sans-serif;background:var(--bg);color:var(
       <div class="f"><label id="l-rescl">Residual Cl₂<span class="lim">0.2–1.0 ppm</span></label><input type="number" id="ct-rescl" step="0.01" value="0.01"></div>
       <div class="f"><label>ORP<span class="lim">300–600 mV</span></label><input type="number" id="ct-orp" value="0"></div>
     </div>
-    <div class="f" style="margin-top:9px"><label>TBC Count<span class="lim">&lt;10,000 CFU/mL</span></label><input type="number" id="ct-tbc" value="0"></div>
+    <input type="hidden" id="ct-tbc" value="0">
   </div>
 
   <div class="slbl" id="l-ct-chem2">Chemical Dosing</div>
@@ -431,7 +442,7 @@ body{font-family:'IBM Plex Sans Thai',sans-serif;background:var(--bg);color:var(
     <div class="mc"><div class="ml">pH</div><div class="mv" id="d-ph">—</div></div>
     <div class="mc"><div class="ml">Conductivity</div><div class="mv" id="d-cond">—</div><span class="mu">µS/cm</span></div>
     <div class="mc"><div class="ml" id="l-rescl2">Residual Cl₂</div><div class="mv" id="d-rescl">—</div><span class="mu">ppm</span></div>
-    <div class="mc"><div class="ml">TBC</div><div class="mv" id="d-tbc">—</div><span class="mu">CFU/mL</span></div>
+    <div class="mc"><div class="ml">ORP</div><div class="mv" id="d-orp">—</div><span class="mu">mV</span></div>
   </div>
   <div class="card" style="padding:14px 14px 6px"><div id="bars"></div></div>
   <div class="aic" style="margin-top:10px"><div class="aic-l" id="l-ai-sum">สรุปสถานะ</div><p id="ai-sum">—</p></div>
@@ -685,13 +696,13 @@ const T = {
     'tb-title':'Cooling Tower QA','tb-sub':'v13 | PIN | Image | Email History',
     'l-sw-info':'ข้อมูลตัวอย่าง — Supply Water','l-date':'วันที่','l-loc':'Location',
     'l-seq':'ลำดับ','l-type':'ประเภทแหล่งน้ำ','l-sname':'Sample Name',
-    'l-sw-phys':'Physical / Chemical','l-sw-chem':'Chemistry',
+    'l-sw-phys':'Physical / Chemical','l-sw-chem':'Chemistry & Ions',
     'l-cond-sw':'Conductivity','l-th-sw':'Total Hardness',
     'btn-save-sw':'บันทึก Supply Water →',
     'l-ct-info':'ข้อมูลตัวอย่าง — Cooling Tower','l-date2':'วันที่','l-cttype':'CT Type',
     'l-ctloc':'Location','l-ctsname':'Sample Name',
     'l-swid':'SW Sample ID (เลือกแหล่งน้ำ วันนี้+Location)',
-    'l-ct-phys':'Physical','l-ct-chem':'Chemistry',
+    'l-ct-phys':'Physical','l-ct-chem':'Chemistry & Ions',
     'l-ct-scale':'Scale & Ions','l-ct-bio':'Biological',
     'l-rescl':'Residual Cl₂','l-ct-chem2':'Chemical Dosing',
     'l-ct-sys':'System Status','l-cds':'Hot Water Inlet','l-cdr':'Cold Water Outlet',
@@ -742,13 +753,13 @@ const T = {
     'tb-title':'Cooling Tower QA','tb-sub':'v13 | PIN | Image | Email History',
     'l-sw-info':'Sample Info — Supply Water','l-date':'Date','l-loc':'Location',
     'l-seq':'Seq.','l-type':'Water Source Type','l-sname':'Sample Name',
-    'l-sw-phys':'Physical / Chemical','l-sw-chem':'Chemistry',
+    'l-sw-phys':'Physical / Chemical','l-sw-chem':'Chemistry & Ions',
     'l-cond-sw':'Conductivity','l-th-sw':'Total Hardness',
     'btn-save-sw':'Save Supply Water →',
     'l-ct-info':'Sample Info — Cooling Tower','l-date2':'Date','l-cttype':'CT Type',
     'l-ctloc':'Location','l-ctsname':'Sample Name',
     'l-swid':'SW Sample ID (select source: today + Location)',
-    'l-ct-phys':'Physical','l-ct-chem':'Chemistry',
+    'l-ct-phys':'Physical','l-ct-chem':'Chemistry & Ions',
     'l-ct-scale':'Scale & Ions','l-ct-bio':'Biological',
     'l-rescl':'Residual Cl₂','l-ct-chem2':'Chemical Dosing',
     'l-ct-sys':'System Status','l-cds':'Hot Water Inlet','l-cdr':'Cold Water Outlet',
@@ -883,6 +894,16 @@ function onSwType(){
   calcSWAuto();
 }
 
+// pH clamp — enforce 0–14 on blur
+function clampPH(id){
+  const el=g(id); if(!el) return;
+  let v=parseFloat(el.value);
+  if(isNaN(v)) return;
+  if(v<0) v=0; if(v>14) v=14;
+  el.value=v;
+  if(id==='ct-ph') calcCTAuto();
+}
+
 // ══════════════════════════════════════════════════
 // Auto-calc
 // ══════════════════════════════════════════════════
@@ -1001,6 +1022,8 @@ async function saveSW(){
   const sid=gvs('sw-sid'),type=gvs('sw-type');
   const cond=gv('sw-cond'),ph=gv('sw-ph'),tur=gv('sw-tur'),fe=gv('sw-fe');
   const th=gv('sw-th'),alk=gv('sw-alk'),tds=parseFloat(g('sw-tds').value)||0,cah=parseFloat(g('sw-cah').value)||0;
+  const swClRaw=gvs('sw-cl'); const swCl=swClRaw?parseFloat(swClRaw):null;
+  const swSio2Raw=gvs('sw-sio2'); const swSio2=swSio2Raw?parseFloat(swSio2Raw):null;
   const lim=SW_LIM[type]||SW_LIM.Municipal;
   const bads=[];
   if(ph<6.5||ph>7.5)bads.push('pH');
@@ -1009,13 +1032,15 @@ async function saveSW(){
   if(th>lim.th)bads.push('TH');
   if(alk>lim.alk)bads.push('Alk');
   if(fe>1.0)bads.push('Fe');
+  if(swCl!==null&&swCl>100)bads.push('Cl');
+  if(swSio2!==null&&swSio2>100)bads.push('SiO2');
   const status=bads.length>0?'FAIL':(cond>lim.cond*0.8||tur>5||th>lim.th*0.85||alk>lim.alk*0.85)?'WARN':'PASS';
-  swLog.push({sid,date,locCode:code,type,name:gvs('sw-name'),tmp:gv('sw-tmp'),ph,cond,tur,tds,th,cah,alk,fe,status});
+  swLog.push({sid,date,locCode:code,type,name:gvs('sw-name'),tmp:gv('sw-tmp'),ph,cond,tur,tds,th,cah,alk,fe,cl:swCl,sio2:swSio2,status});
   localStorage.setItem('sw_log16',JSON.stringify(swLog));
   // ── Send to Google Sheet ──
   sendToGAS('save_sw',{
     date,sid,locCode:code,type,name:gvs('sw-name'),
-    tmp:gv('sw-tmp'),ph,cond,tur,tds,th,cah,alk,fe,status
+    tmp:gv('sw-tmp'),ph,cond,tur,tds,th,cah,alk,fe,cl:swCl,sio2:swSio2,status
   });
   g('ct-date').value=date; refreshCT(); sw_nav('ct');
   setTimeout(()=>{refreshLocDDL();refreshCT();},100);
@@ -1036,23 +1061,25 @@ const L={
   coc:{lo:2.0,hi:8.0,unit:'×',label:'CoC',limTxt:'2.0–8.0'},
   lsi:{lo:-0.5,hi:0.5,unit:'',label:'LSI',limTxt:'–0.5–+0.5'},
   cl:{lo:0,hi:300,unit:'mg/L',label:'Chloride',limTxt:'<300'},
-  so4:{lo:0,hi:500,unit:'mg/L',label:'Sulfate',limTxt:'<500'},
+  so4:{lo:0,hi:500,unit:'mg/L',label:'Sulfate',limTxt:'<250/500'},
 };
 const FC={ok:'#1E8449',warn:'#F0A500',bad:'#E74C3C'};
 
 function chk(k,v){
   const l=L[k]; if(!l)return 'ok';
+  if(v===null||v===undefined) return 'ok';
   if(k==='rescl')return v>=l.lo&&v<=l.hi?'ok':v<0.1?'bad':'warn';
   if(k==='orp')  return v===0?'ok':v>=l.lo?'ok':v>=250?'warn':'bad';
   if(k==='tbc')  return v===0?'ok':v<=l.hi?'ok':v<=l.hi*2?'warn':'bad';
   if(k==='ph')   return v>=l.lo&&v<=l.hi?'ok':(v<6.5||v>9)?'bad':'warn';
   if(k==='cond') return v>=l.lo&&v<=l.hi?'ok':v>2800?'bad':'warn';
   if(k==='coc')  return v>=l.lo&&v<=l.hi?'ok':v>l.hi?'bad':'warn';
+  if(k==='so4')  return v<=250?'ok':v<=500?'warn':'bad';
   if(k==='lsi'){
     if(v===null||v===undefined) return 'ok';
-    if(Math.abs(v)<=0.2) return 'ok';        // balanced ±0.2
-    if(Math.abs(v)<=0.5) return 'warn';       // slight tendency
-    return 'bad';                               // strong tendency
+    if(Math.abs(v)<=0.2) return 'ok';
+    if(Math.abs(v)<=0.5) return 'warn';
+    return 'bad';
   }
   return v<=l.hi?'ok':v<=l.hi*1.2?'warn':'bad';
 }
@@ -1098,10 +1125,13 @@ async function analyze(){
   const blowVal=parseFloat(gvs('ct-blow'));
   const mkupStr=gvs('ct-makeup');
 
+  const ctPhVal=gv('ct-ph');
+  const ctSo4Raw=g('ct-so4').value; const ctSo4=ctSo4Raw===''?null:parseFloat(ctSo4Raw);
+  const ctSio2Raw=g('ct-sio2').value; const ctSio2=ctSio2Raw===''?null:parseFloat(ctSio2Raw);
   const v={
-    tmp:gv('ct-tmp'),ph:gv('ct-ph'),cond:ctCond,tur:gv('ct-tur'),tds:ctCond*0.75,
+    tmp:gv('ct-tmp'),ph:ctPhVal,cond:ctCond,tur:gv('ct-tur'),tds:ctCond*0.75,
     th:gv('ct-th'),alk:gv('ct-alk'),fe:gv('ct-fe'),
-    cl:gv('ct-cl'),so4:gv('ct-so4'),sio2:gv('ct-sio2'),
+    cl:gv('ct-cl'),so4:ctSo4,sio2:ctSio2,
     rescl:gv('ct-rescl'),orp:gv('ct-orp'),tbc:gv('ct-tbc'),
     recirc:gv('ct-recirc'),tin:gv('ct-tin'),tout:gv('ct-tout'),sci:gv('ct-sci'),bio:gv('ct-bio'),
     ctype,rt:isNaN(rtVal)?null:rtVal,
@@ -1120,7 +1150,7 @@ async function analyze(){
 
   // fill AI screen
   g('d-ph').textContent=v.ph.toFixed(1); g('d-cond').textContent=v.cond;
-  g('d-rescl').textContent=v.rescl.toFixed(2); g('d-tbc').textContent=v.tbc.toLocaleString();
+  g('d-rescl').textContent=v.rescl.toFixed(2); g('d-orp').textContent=v.orp;
   g('r-tds').textContent=v.tds.toFixed(0)+' mg/L';
   g('r-ph').textContent=v.phEst!==null?v.phEst.toFixed(2):'—';
   g('r-cah').textContent=v.caH.toFixed(0)+' mg/L CaCO₃';
@@ -1141,17 +1171,18 @@ async function analyze(){
     g('ai-coc-b').innerHTML=`<span class="badge b-${cs==='ok'?'coc':cs==='warn'?'wn':'bd'}"><span class="bdot"></span>${cs==='ok'?'NORMAL ✓':cs==='warn'?'LOW ▼':'HIGH ▲'}</span>`;
   } else { g('ai-coc').textContent=t('lbl-no-sw-data'); g('ai-coc-d').textContent=''; g('ai-coc-b').innerHTML=''; }
 
-  const bkK=['ph','cond','tur','rescl','sio2','cl']; if(v.coc!==null)bkK.push('coc');
+  const bkK=['ph','cond','tur','rescl','cl']; if(v.coc!==null)bkK.push('coc');
+  if(v.sio2!==null) bkK.push('sio2');
   if(v.lsiMin!==null) bkK.push('lsi');
   g('bars').innerHTML=bkK.map(k=>{
     const val=k==='coc'?v.coc:k==='lsi'?(v.lsiMax):v[k];
     const s=chk(k,val); const p=Math.max(2,Math.min(100,pct(k,val))).toFixed(0);
-    const disp=k==='coc'?val.toFixed(2)+'×':k==='tbc'?val.toLocaleString():k==='lsi'?v.lsiStr:typeof val==='number'&&val%1!==0?val.toFixed(2):val;
+    const disp=k==='coc'?val.toFixed(2)+'×':k==='lsi'?v.lsiStr:typeof val==='number'&&val%1!==0?val.toFixed(2):val;
     return `<div class="prow"><div class="prow-h"><span>${L[k]?L[k].label:k}</span><span class="pv">${disp} ${L[k]?L[k].unit:''}</span></div>
       <div class="ptrack"><div class="pfill" style="width:${p}%;background:${FC[s]}"></div></div></div>`;
   }).join('');
 
-  const allK=['ph','cond','tur','rescl','sio2']; if(v.coc!==null)allK.push('coc');
+  const allK=['ph','cond','tur','rescl']; if(v.coc!==null)allK.push('coc');
   const bads=allK.filter(k=>chk(k,k==='coc'?v.coc:v[k])==='bad');
   const warns=allK.filter(k=>chk(k,k==='coc'?v.coc:v[k])==='warn');
   const ov=bads.length>0?'bad':warns.length>0?'warn':'ok';
@@ -1283,14 +1314,13 @@ function buildReport(){
     ]},
     {sec:th?'Chemistry & Scale':'เคมีและ Scale', items:[
       def('cl',v.cl,false),
-      def('so4',v.so4,false),
-      def('sio2',v.sio2,false),
+      ...(v.so4!==null?[def('so4',v.so4,false)]:[{k:'so4',val:null,s:'ok',vd:th?'ไม่ได้วิเคราะห์':'Not analyzed',lim:'<250/500',lbl:'Sulfate',auto:false,cmt:''}]),
+      ...(v.sio2!==null?[def('sio2',v.sio2,false)]:[{k:'sio2',val:null,s:'ok',vd:th?'ไม่ได้วิเคราะห์':'Not analyzed',lim:'<150',lbl:'Silica',auto:false,cmt:''}]),
       def('coc',v.coc!==null?v.coc:0,true,'CoC','2.0–8.0','×',v.coc!==null?v.coc.toFixed(2)+'×':(th?'ไม่มี SW':'No SW')),
     ]},
     {sec:th?'Biological':'ชีวภาพ', items:[
       def('rescl',v.rescl,false),
       def('orp',v.orp,false),
-      def('tbc',v.tbc,false),
     ]},
     {sec:th?'Auto-calculated (ค่าคำนวณ)':'Auto-calculated', items:[
       def(null,v.tds,true,'TDS Est. (Cond×0.75)','—','mg/L',v.tds.toFixed(0)+' mg/L'),
@@ -2098,7 +2128,7 @@ CoC: ${rec.coc!==null?rec.coc.toFixed(2)+'×':'—'}  |  LSI: ${rec.lsiStr}
 // ══════════════════════════════════════════════════
 // Google Apps Script — Send to Google Sheet
 // ══════════════════════════════════════════════════
-const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbxE0fOrbMI4I53xilH6GFB91gLDTdg5SFkP4MBy_PPJJ8_M1M4kGcFj_do_LfT7gMKQSg/exec';
+const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbx6LlDT44vilP051SPyuxr2adfKcrZaLe9gQZrRk9xjdyZT98pfc0QS519l4hLWFP9MrA/exec';
 
 function getGASUrl(){
   const el=g('cfg-gas');
